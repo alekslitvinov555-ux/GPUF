@@ -1,0 +1,3 @@
+numpy
+pandas
+global-land-mask   # optional but recommended: clean coastline / land mask

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[PREVIEW] Global Planetary Analog Finder · NASA Space Apps 2026 · PANEM_U</title>
+<meta name="generator" content="Code drafted with an SI assistant (Claude, Anthropic); reviewed by Team PANEM_U">
+<meta name="description" content="Global Planetary Analog Finder: ranks every land cell on Earth by similarity to Moon and Mars target sites using NASA POWER data.">
+<!-- SI disclosure: this page's code was drafted with the help of an SI assistant (Claude, by Anthropic) and reviewed by Team PANEM_U. -->
+<!-- Built for NASA Space Apps Challenge 2026. No NASA logos or branding elements are used. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ---- essential Leaflet layout rules (inlined so the map works even where external CSS is blocked) ---- */
+  .leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-layer{position:absolute;left:0;top:0}
+  .leaflet-container{overflow:hidden;-webkit-tap-highlight-color:transparent;outline-offset:1px}
+  .leaflet-tile,.leaflet-marker-icon{user-select:none;-webkit-user-drag:none}
+  .leaflet-container img.leaflet-tile,.leaflet-container .leaflet-tile{max-width:none!important;max-height:none!important;width:256px;height:256px}
+  .leaflet-tile{visibility:hidden}.leaflet-tile-loaded{visibility:inherit}
+  .leaflet-zoom-animated{transform-origin:0 0}
+  .leaflet-zoom-anim .leaflet-zoom-animated{transition:transform .25s cubic-bezier(0,0,.25,1)}
+  .leaflet-zoom-anim .leaflet-tile,.leaflet-pan-anim .leaflet-tile{transition:none}
+  .leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
+  .leaflet-control{position:relative;z-index:800;pointer-events:auto;float:left;clear:both}
+  .leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
+  .leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
+  .leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:12px}.leaflet-bottom .leaflet-control{margin-bottom:0}
+  .leaflet-left .leaflet-control{margin-left:12px}.leaflet-right .leaflet-control{margin-right:0}
+  .leaflet-bar{border-radius:10px;overflow:hidden;border:1px solid var(--line);box-shadow:0 6px 20px rgba(0,0,0,.35)}
+  .leaflet-bar a{display:block;width:34px;height:34px;line-height:34px;text-align:center;background:rgba(20,22,26,.9);color:var(--ink);text-decoration:none;font:600 18px/34px Inter,system-ui}
+  .leaflet-bar a:hover{background:#262a31}.leaflet-bar a+a{border-top:1px solid var(--line)}
+  .leaflet-control-attribution{background:rgba(12,14,17,.75);color:var(--ink-3);margin:0;padding:1px 8px;font-size:10.5px;border-top-left-radius:6px}
+  .leaflet-control-attribution a{color:var(--ink-2)}
+  .leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:grab}.leaflet-dragging .leaflet-grab{cursor:grabbing}
+  .leaflet-pane>svg path{pointer-events:none}.leaflet-pane>svg path.leaflet-interactive,.leaflet-marker-icon.leaflet-interactive{pointer-events:auto}
+  .leaflet-tooltip{position:absolute;padding:5px 9px;background:rgba(14,16,19,.95);color:var(--ink);border:1px solid var(--line);border-radius:6px;white-space:nowrap;pointer-events:none;font:500 12px Inter,system-ui;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+
+  /* ---- design tokens ---- */
+  :root{
+    --bg:#07090c; --panel:#101317; --panel-2:#161a20; --panel-3:#1d222a; --line:#2a3039;
+    --ink:#eef0f2; --ink-2:#b9bec6; --ink-3:#7f8691;
+    --heat:#eb6834; --heat-hi:#ffd2b3; --gem:#1baf7a; --case:#eda100; --known:#ffffff;
+    --radius:12px; --shadow:0 12px 40px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit}
+  :focus-visible{outline:2px solid var(--heat);outline-offset:2px}
+
+  /* ---- top bar ---- */
+  .top{position:fixed;inset:0 0 auto 0;height:60px;display:flex;align-items:center;gap:14px;padding:0 18px;z-index:20;
+    background:linear-gradient(180deg,rgba(7,9,12,.96),rgba(7,9,12,.82));border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+  .brand{display:flex;align-items:center;gap:12px;min-width:0}
+  .brand h1{font:700 18px/1.1 "Space Grotesk",Inter,sans-serif;margin:0;letter-spacing:.2px;white-space:nowrap}
+  .brand .tagline{font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .spacer{flex:1}
+  .seg{display:flex;background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .seg button{border:0;background:transparent;padding:7px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13px;color:var(--ink-2)}
+  .seg button.on{background:var(--ink);color:#0b0d10}
+
+  /* ---- layout ---- */
+  .app{position:fixed;inset:60px 0 0 0;display:flex}
+  .side{width:388px;min-width:388px;height:100%;overflow-y:auto;background:var(--panel);border-right:1px solid var(--line);padding:18px 18px 40px;scrollbar-width:thin;scrollbar-color:#2a3039 transparent}
+  .stage{position:relative;flex:1;height:100%;overflow:hidden;background:radial-gradient(1200px 700px at 60% 40%,#0d1726 0%,#070a10 60%,#05070a 100%)}
+  #map,#globe{position:absolute;inset:0}
+  #map{background:#0a1626;z-index:0}
+  #globe{display:none;cursor:grab}
+  #globe canvas{display:block}
+  body.view-globe #globe{display:block} body.view-globe #map{display:none}
+
+  /* ---- sidebar ---- */
+  .step{display:flex;align-items:center;gap:10px;margin:22px 0 10px}
+  .step:first-child{margin-top:4px}
+  .step .n{width:22px;height:22px;border-radius:50%;background:var(--panel-3);border:1px solid var(--line);display:grid;place-items:center;font:700 11px Inter;color:var(--ink-2)}
+  .step h2{margin:0;font:600 13px/1.2 "Space Grotesk",Inter;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-2)}
+  .lead{color:var(--ink-2);font-size:13px;margin:0 0 8px}
+  .muted{color:var(--ink-3);font-size:12px}
+  .targets{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .tbtn{position:relative;text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:10px 11px 11px;cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden}
+  .tbtn:hover{background:var(--panel-3)}
+  .tbtn .body{display:flex;align-items:center;gap:6px;font:700 10.5px Inter;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3)}
+  .tbtn .dot{width:9px;height:9px;border-radius:50%}
+  .tbtn .ttl{display:block;margin-top:3px;font-weight:600;font-size:13px;line-height:1.3;color:var(--ink)}
+  .tbtn.on{border-color:var(--heat);background:linear-gradient(180deg,rgba(235,104,52,.14),rgba(235,104,52,.03))}
+  .card{background:var(--panel-2);border:1px solid var(--line);border-radius:var(--radius);padding:12px 13px}
+  .slider{display:grid;grid-template-columns:1fr 92px 22px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(42,48,57,.6)}
+  .slider:last-child{border-bottom:0}
+  .slider .nm{font-size:13px;font-weight:500}.slider .why{display:block;font-size:11.5px;color:var(--ink-3);font-weight:400}
+  .slider input{width:92px;accent-color:var(--heat)}
+  .slider .wv{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:12px;text-align:right}
+  .linkbtn{background:none;border:0;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 0 0;font-size:12.5px}
+  .kpi{display:flex;align-items:baseline;gap:10px;margin:2px 0 4px}
+  .kpi .big{font:700 30px/1 "Space Grotesk",Inter;font-variant-numeric:tabular-nums}
+  .row{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid rgba(42,48,57,.6);font-size:13px}
+  .row:last-child{border-bottom:0}.row .r{color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .gem{display:grid;grid-template-columns:24px 1fr auto;gap:10px;align-items:center;padding:8px 6px;border-radius:9px;cursor:pointer}
+  .gem:hover,.gem:focus-visible{background:var(--panel-3)}
+  .num{width:24px;height:24px;border-radius:50%;background:var(--gem);color:#fff;font:700 11px/24px Inter;text-align:center;box-shadow:0 0 0 2px rgba(27,175,122,.25)}
+  .gem .loc{font-size:13px;font-weight:500}.gem .co{font-size:11.5px;color:var(--ink-3)}
+  .gem .sc{font:600 13px Inter;color:var(--ink);font-variant-numeric:tabular-nums}
+  .tog{display:flex;align-items:center;gap:9px;font-size:13px;margin:7px 0;cursor:pointer;color:var(--ink-2)}
+  .tog input{accent-color:var(--heat)}
+  .sym-known{width:13px;height:13px;border-radius:50%;border:2px solid var(--known)}
+  .sym-gem{width:13px;height:13px;border-radius:50%;background:var(--gem)}
+  .sym-case{width:11px;height:11px;background:var(--case);transform:rotate(45deg)}
+  select{background:var(--panel-2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:13px}
+  .foot{font-size:11.5px;color:var(--ink-3);margin-top:22px;line-height:1.55}
+  .foot b{color:var(--ink-2)}
+  .warn{background:#2c2110;border:1px solid #6b4a12;color:#f3d9a6;border-radius:10px;padding:9px 11px;font-size:12.5px;margin-bottom:12px}
+
+  /* ---- floating legend ---- */
+  .legend{position:absolute;left:16px;bottom:16px;z-index:15;background:rgba(12,14,17,.86);border:1px solid var(--line);border-radius:var(--radius);padding:10px 12px;backdrop-filter:blur(8px);box-shadow:var(--shadow);min-width:250px}
+  .legend .t{font:600 12px Inter;color:var(--ink-2);margin-bottom:6px}
+  .legend-bar{height:10px;border-radius:5px;background:linear-gradient(90deg,rgba(138,53,16,.15) 0%,rgba(235,104,52,.7) 55%,rgba(255,214,186,.95) 100%)}
+  .legend-note{font-size:11px;color:var(--ink-3);margin-top:6px;max-width:250px;line-height:1.4}
+  .legend-scale{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:3px}
+  .legend .keys{display:flex;gap:12px;margin-top:8px;font-size:11.5px;color:var(--ink-2)} .legend .keys span{display:flex;align-items:center;gap:5px}
+  .planet{position:absolute;left:16px;top:16px;z-index:15;width:250px;border-radius:16px;background:radial-gradient(120% 90% at 50% 40%,rgba(30,22,20,.92),rgba(8,9,12,.92));
+    border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(8px)}
+  .planet canvas{display:block;width:250px;height:250px;cursor:grab}
+  .planet .cap{padding:9px 12px 11px;border-top:1px solid var(--line)}
+  .planet .cap .k{font:600 10.5px Inter;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3)}
+  .planet .cap .v{font:700 14px/1.3 "Space Grotesk",Inter;margin-top:2px}
+  .planet .cap .s{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+  .planet-sites{list-style:none;margin:8px 0 0;padding:0;max-height:200px;overflow:auto}
+  .planet-sites li{padding:6px 0;border-top:1px solid var(--line)}
+  .planet-sites button{background:none;border:0;color:var(--ink);padding:0;text-align:left;cursor:pointer;font:inherit}
+  .planet-sites button[aria-pressed=true]{color:#ffad85}
+  .planet-sites span{display:block;margin:2px 0}
+  .planet-sites a,#planet-local-map{color:#9ac9f5}
+  .planet .min{position:absolute;right:8px;top:8px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:rgba(16,19,23,.8);cursor:pointer;color:var(--ink-2);font-size:14px;line-height:1}
+  .planet.collapsed canvas,.planet.collapsed .cap .s{display:none}
+  .planet.collapsed{width:auto}
+  .hint{position:absolute;left:50%;transform:translateX(-50%);top:14px;z-index:15;background:rgba(12,14,17,.8);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:12px;color:var(--ink-2);pointer-events:none}
+
+  /* ---- place card ---- */
+  .pc{position:absolute;right:16px;top:16px;bottom:16px;width:372px;z-index:16;display:none;flex-direction:column;
+    background:rgba(13,15,19,.94);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);backdrop-filter:blur(10px);overflow:hidden}
+  .pc.open{display:flex}
+  .pc .hd{padding:16px 16px 12px;border-bottom:1px solid var(--line);position:relative}
+  .pc .kind{font:600 10.5px Inter;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3)}
+  .pc h3{margin:4px 30px 2px 0;font:700 19px/1.2 "Space Grotesk",Inter}
+  .pc .co{font-size:12px;color:var(--ink-3)}
+  .pc .x{position:absolute;right:12px;top:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;font-size:16px;line-height:1}
+  .pc .bd{padding:14px 16px 18px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#2a3039 transparent}
+  .pc .score{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+  .ring{--p:0;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--heat) calc(var(--p)*1%),var(--panel-3) 0);flex:none}
+  .ring b{width:50px;height:50px;border-radius:50%;background:#0f1216;display:grid;place-items:center;font:700 16px "Space Grotesk",Inter;font-variant-numeric:tabular-nums}
+  .pc .score .t{font-size:13px;color:var(--ink-2)} .pc .score .t strong{color:var(--ink)}
+  .pc p{color:var(--ink-2);font-size:13px;margin:6px 0 10px}
+  .fb{display:grid;grid-template-columns:1fr 96px;gap:1px 12px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(42,48,57,.55)}
+  .fb .l{font-size:13px;font-weight:500}.fb .v{font-size:11.5px;color:var(--ink-3);grid-column:1}
+  .fb .bar{grid-column:2;grid-row:1/span 2;height:8px;background:var(--panel-3);border-radius:4px;overflow:hidden}
+  .fb .bar i{display:block;height:100%;background:var(--heat);border-radius:0 4px 4px 0}
+  .pc h4{font:600 11px Inter;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-3);margin:14px 0 6px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink-2);background:var(--panel-2)}
+  .chip.ok{border-color:rgba(27,175,122,.55)} .chip.no{border-color:rgba(235,104,52,.55)}
+  .pc ul{margin:0;padding-left:17px;color:var(--ink-2);font-size:12.5px} .pc li{margin:3px 0}
+
+  /* ---- markers ---- */
+  .lbl-gem{background:var(--gem);color:#fff;border-radius:50%;width:24px;height:24px;font:700 11px/24px Inter;text-align:center;border:2px solid #0b0d10;box-shadow:0 0 0 1px var(--gem),0 4px 10px rgba(0,0,0,.5)}
+  .lbl-case{width:14px;height:14px;background:var(--case);transform:rotate(45deg);border:2px solid #0b0d10;box-shadow:0 0 0 1px var(--case)}
+  .sel-ring{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 4px rgba(255,255,255,.18);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{transform:scale(.7);opacity:1}100%{transform:scale(1.5);opacity:0}}
+  .loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-2);font-size:13px;z-index:14;pointer-events:none}
+
+  @media (max-width:900px){
+    .planet{display:none}
+    .brand .tagline{display:none}
+    .app{flex-direction:column-reverse}
+    .side{width:100%;min-width:0;height:48%}
+    .stage{height:52%;flex:none}
+    .pc{left:10px;right:10px;width:auto;top:auto;height:70%}
+    .legend{display:none}
+  }
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script type="importmap">
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body class="view-map">
+<header class="top">
+  <div class="brand">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">
+      <circle cx="17" cy="17" r="9" fill="#1b4f8a"/><circle cx="17" cy="17" r="9" fill="none" stroke="#7fb8ff" stroke-width="1.2" opacity=".7"/>
+      <ellipse cx="17" cy="17" rx="15.5" ry="5.2" fill="none" stroke="#eb6834" stroke-width="1.6" transform="rotate(-24 17 17)"/>
+      <circle cx="30.4" cy="11" r="2.6" fill="#c1440e"/>
+    </svg>
+    <div style="min-width:0">
+      <h1>Global Planetary Analog Finder</h1>
+      <div class="tagline">Where on Earth is most like the Moon and Mars? · NASA Space Apps Challenge 2026 · Team PANEM_U · Dnipro, Ukraine</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="seg" role="tablist" aria-label="View">
+    <button id="v-map" class="on" role="tab" aria-selected="true">2D Map</button>
+    <button id="v-globe" role="tab" aria-selected="false">3D Globe</button>
+  </div>
+</header>
+
+<div class="app">
+  <aside class="side" aria-label="Controls">
+    <div id="testwarn"></div>
+
+    <div class="step"><span class="n">1</span><h2>Choose a target</h2></div>
+    <div class="targets" id="targets" role="tablist"></div>
+    <div class="card" style="margin-top:10px">
+      <div class="lead" id="psummary"></div>
+      <div class="muted" id="pexamples"></div>
+    </div>
+
+    <div class="step"><span class="n">2</span><h2>Tune what “similar” means</h2></div>
+    <p class="lead">How much each characteristic matters (0 = ignore). Everything updates live.</p>
+    <div class="card" id="sliders" style="padding:4px 13px"></div>
+    <button id="reset" class="linkbtn">Reset weights</button>
+
+    <div class="step"><span class="n">3</span><h2>Does it work?</h2></div>
+    <div class="card">
+      <div class="muted">Well-known analog sites — never used to tune the method — rank in the</div>
+      <div class="kpi"><span class="big" id="valbig">–</span><span class="muted" id="val-area"></span></div>
+      <div class="muted" style="margin-bottom:6px">A random method would put them around the top 50%.</div>
+      <div id="vallist"></div>
+    </div>
+
+    <div class="step"><span class="n">4</span><h2>Hidden gems</h2></div>
+    <p class="lead">Best-matching places at least <span id="novkm"></span> km from any well-known analog site. Click to fly there.</p>
+    <div id="gems"></div>
+
+    <div class="step"><span class="n">5</span><h2>Layers</h2></div>
+    <label class="tog"><input type="checkbox" id="t-heat" checked> Similarity heatmap</label>
+    <label class="tog"><input type="checkbox" id="t-known" checked> <span class="sym-known"></span> Well-known analog sites</label>
+    <label class="tog"><input type="checkbox" id="t-gems" checked> <span class="sym-gem"></span> Hidden gems (our discoveries)</label>
+    <label class="tog"><input type="checkbox" id="t-case" checked> <span class="sym-case"></span> Local case studies (Ukraine)</label>
+    <label class="tog" style="justify-content:space-between">Earth imagery
+      <select id="basemap">
+        <option value="BlueMarble_NextGeneration">Blue Marble (true colour)</option>
+        <option value="BlueMarble_ShadedRelief_Bathymetry">Shaded relief</option>
+        <option value="VIIRS_CityLights_2012">Night lights</option>
+      </select></label>
+
+    <div class="foot">
+      <b>Data:</b> NASA POWER 2001–2025 climatology (MERRA-2 reanalysis, CERES SYN1deg albedo). Earth imagery: NASA GIBS (Blue Marble, VIIRS). Place names © OpenStreetMap contributors.<br>
+      <b>Method:</b> 11 environmental features per land cell → area-weighted percentiles across <span id="method-area"></span> → Gaussian match to each target (σ = <span id="sig"></span>) → weighted mean. <br><b>Developed by Team PANEM_U</b> · Dnipro, Ukraine.
+    </div>
+  </aside>
+
+  <main class="stage" id="stage">
+    <div id="map" aria-label="2D similarity map"></div>
+    <div id="globe" aria-label="3D globe"><div class="loading" id="gload">Loading the 3D globe…</div></div>
+    <div class="planet" id="planet" aria-label="Target planet">
+      <button class="min" id="planet-min" aria-label="Collapse">–</button>
+      <canvas id="planet-canvas" width="500" height="500"></canvas>
+      <div class="cap"><div class="k" id="planet-k">Target</div><div class="v" id="planet-v"></div><div class="s" id="planet-s"></div><details class="s"><summary>Target coordinates</summary><ul id="planet-sites" class="planet-sites"></ul><a id="planet-local-map" target="_blank" rel="noopener noreferrer" hidden>NASA regional map</a></details></div>
+    </div>
+    <div class="hint" id="hint">Click anywhere on land to see why it is — or isn't — a good analog</div>
+    <div class="legend">
+      <div class="t" id="legtitle">Similarity rank</div>
+      <div class="legend-bar"></div>
+      <div class="legend-scale"><span>Top 25%</span><span>Top 10%</span><span id="legend-area"></span></div>
+      <div class="legend-note">Orange shows how similar each place on Earth is to the target — it is not imagery of Mars or the Moon.</div>
+      <div class="keys"><span><i class="sym-known"></i>Known</span><span><i class="sym-gem"></i>Hidden gem</span><span><i class="sym-case"></i>Case study</span></div>
+    </div>
+    <aside class="pc" id="pc" aria-live="polite">
+      <div class="hd"><div class="kind" id="pc-kind"></div><h3 id="pc-title"></h3><div class="co" id="pc-co"></div>
+        <button class="x" id="pc-x" aria-label="Close">×</button></div>
+      <div class="bd" id="pc-bd"></div>
+    </aside>
+  </main>
+</div>
+
+
+<script src="excluded-grid.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+window.__afMain = (function () {
+  function isExcluded(latIndex, lonIndex) {
+    const edges = window.EXCLUDED_GRID[latIndex] || [];
+    const column = ((lonIndex + 288) % 576 + 576) % 576;
+    return edges.some((start, i) => i % 2 === 0 && start <= column && column < edges[i + 1]);
+  }
+  const D = window.ANALOG_DATA;
+  if (!D) { document.getElementById('stage').innerHTML = '<div class="loading">data.js not found — run 1_download_data.py and 2_build_dataset.py first.</div>'; return; }
+  const excludedCell = i => isExcluded(D.lat[i], D.lon[i]);
+  const CFG = D.config, FEATS = CFG.features, SIG = D.sigma;
+  const N = D.lat.length, NLAT = 361, NLON = 576;
+  const $ = id => document.getElementById(id);
+  const comparisonArea = D.preview ? 'the demo sample' : D.test_mode ? 'sampled land' : 'eligible land';
+  $('val-area').textContent = 'of ' + comparisonArea + ' (median)';
+  $('method-area').textContent = comparisonArea;
+  $('legend-area').textContent = 'Top 1% of ' + comparisonArea;
+  $('sig').textContent = SIG; $('novkm').textContent = D.novelty_km;
+  if (D.preview) $('testwarn').innerHTML = '<div class="warn">Design preview with synthetic demo data (derived from imagery). Run the two scripts to see the real NASA POWER results.</div>';
+  else if (D.test_mode) $('testwarn').innerHTML = '<div class="warn">Test mode: only a few regions were downloaded. Run the full download for the global map.</div>';
+  const PCOL = { mars_equatorial: '#c1440e', mars_periglacial: '#e0a27a', moon_south_pole: '#c9ccd3', moon_mare: '#7d8189' };
+
+  // ---------------- data
+  const LAT = new Float32Array(N), LON = new Float32Array(N), W = new Float64Array(N);
+  for (let i = 0; i < N; i++) { LAT[i] = D.lat[i] / 2; LON[i] = D.lon[i] * 0.625; W[i] = Math.cos(LAT[i] * Math.PI / 180) + 1e-6; }
+  const VAL = {};
+  for (const f in FEATS) { const s = D.scale[f], a = new Float32Array(N), src = D.values[f];
+    for (let i = 0; i < N; i++) a[i] = excludedCell(i) || src[i] == null ? NaN : src[i] / s; VAL[f] = a; }
+  const gridIdx = new Int32Array(NLAT * NLON).fill(-1);
+  const rowOf = lat => Math.round((lat + 90) * 2), colOf = lon => ((Math.round((lon + 180) / 0.625) % NLON) + NLON) % NLON;
+  for (let i = 0; i < N; i++) if (!excludedCell(i)) gridIdx[rowOf(LAT[i]) * NLON + colOf(LON[i])] = i;
+
+  function wpct(arr) {
+    const idx = []; for (let i = 0; i < N; i++) if (!Number.isNaN(arr[i])) idx.push(i);
+    idx.sort((a, b) => arr[a] - arr[b]);
+    let tot = 0; for (const i of idx) tot += W[i];
+    const out = new Float32Array(N).fill(NaN); let cum = 0, k = 0;
+    while (k < idx.length) { let j = k, ws = 0; while (j < idx.length && arr[idx[j]] === arr[idx[k]]) { ws += W[idx[j]]; j++; }
+      const p = (cum + ws / 2) / tot; for (let q = k; q < j; q++) out[idx[q]] = p; cum += ws; k = j; }
+    return { pct: out, sorted: idx, tot };
+  }
+  const PCT = {}, SORTED = {};
+  for (const f in FEATS) { const r = wpct(VAL[f]); PCT[f] = r.pct; SORTED[f] = r; }
+  function valueToPct(f, v) { const r = SORTED[f]; let cum = 0; for (const i of r.sorted) { if (VAL[f][i] > v) break; cum += W[i]; } return cum / r.tot; }
+  const tPctCache = {};
+  const tPct = (f, t) => { if ('pct' in t) return t.pct; const k = f + ':' + t.value; return k in tPctCache ? tPctCache[k] : (tPctCache[k] = valueToPct(f, t.value)); };
+
+  // ---------------- state & scoring
+  let PID = Object.keys(CFG.profiles)[0], WEIGHTS = {};
+  let SCORE = new Float32Array(N), SPCT = new Float32Array(N), GEMS = [];
+  const PROF = () => CFG.profiles[PID];
+  const listeners = [];
+  function hav(a1, o1, a2, o2) { const r = Math.PI / 180, dA = (a2 - a1) * r, dO = (o2 - o1) * r;
+    const h = Math.sin(dA / 2) ** 2 + Math.cos(a1 * r) * Math.cos(a2 * r) * Math.sin(dO / 2) ** 2; return 12742 * Math.asin(Math.sqrt(h)); }
+  function nearestCell(lat, lon, maxKm) {
+    let best = -1, bd = 1e9; const r0 = rowOf(lat), c0 = Math.round((lon + 180) / 0.625);
+    for (let dr = -4; dr <= 4; dr++) for (let dc = -6; dc <= 6; dc++) {
+      const r = r0 + dr, c = ((c0 + dc) % NLON + NLON) % NLON; if (r < 0 || r >= NLAT) continue;
+      const i = gridIdx[r * NLON + c]; if (i < 0) continue; const d = hav(lat, lon, LAT[i], LON[i]); if (d < bd) { bd = d; best = i; } }
+    return bd <= maxKm ? { i: best, d: bd } : null;
+  }
+  function match(f, i) { const t = PROF().targets[f]; const p = PCT[f][i]; if (Number.isNaN(p)) return 0.5; const d = (p - tPct(f, t)) / SIG; return Math.exp(-d * d); }
+  function compute() {
+    const T = PROF().targets, fs = Object.keys(T).filter(f => WEIGHTS[f] > 0), tp = {};
+    fs.forEach(f => tp[f] = tPct(f, T[f])); let den = 0; fs.forEach(f => den += WEIGHTS[f]);
+    for (let i = 0; i < N; i++) {
+      if (excludedCell(i)) { SCORE[i] = NaN; continue; }
+      let s = 0;
+      for (const f of fs) { const p = PCT[f][i]; let m; if (Number.isNaN(p)) m = 0.5; else { const d = (p - tp[f]) / SIG; m = Math.exp(-d * d); } s += WEIGHTS[f] * m; }
+      SCORE[i] = den > 0 ? s / den : 0; }
+    SPCT = wpct(SCORE).pct;
+    const order = Array.from({ length: N }, (_, i) => i).filter(i => !Number.isNaN(SCORE[i])).sort((a, b) => SCORE[b] - SCORE[a]); GEMS = [];
+    for (const i of order) { if (GEMS.length >= D.n_gems) break;
+      if (CFG.known_analogs.some(k => hav(LAT[i], LON[i], k.lat, k.lon) < D.novelty_km)) continue;
+      if (GEMS.some(g => hav(LAT[i], LON[i], LAT[g], LON[g]) < D.gem_spacing_km)) continue; GEMS.push(i); }
+  }
+
+  // ---------------- smooth equirectangular heat texture (shared by 2D map and 3D globe)
+  const HEAT = document.createElement('canvas'); HEAT.width = 2304; HEAT.height = 1152;
+  const hctx = HEAT.getContext('2d', { willReadFrequently: true });
+  const small = document.createElement('canvas'); small.width = NLON; small.height = NLAT;
+  let HEATDATA = null, showLand = false;
+  const CUT = 0.75;  // only the most similar 25% of Earth's land is highlighted; the rest keeps its natural colours
+  function colour(p) { if (Number.isNaN(p)) return null; if (!(p > CUT)) return showLand ? [66, 70, 76, 150] : null;
+    const t = (p - CUT) / (1 - CUT), e = Math.pow(t, 1.6);
+    const c0 = [138, 53, 16], c1 = [235, 104, 52], c2 = [255, 214, 186];
+    const c = e < 0.55 ? c0.map((v, k) => v + (c1[k] - v) * (e / 0.55)) : c1.map((v, k) => v + (c2[k] - v) * ((e - 0.55) / 0.45));
+    return [c[0] | 0, c[1] | 0, c[2] | 0, Math.round(255 * (0.12 + 0.78 * Math.pow(t, 1.5)))]; }
+  function renderHeat() {
+    const sctx = small.getContext('2d'), img = sctx.createImageData(NLON, NLAT);
+    for (let i = 0; i < N; i++) { const col = colour(SPCT[i]); if (!col) continue;
+      const x = colOf(LON[i]), y = (NLAT - 1) - rowOf(LAT[i]), o = (y * NLON + x) * 4;
+      img.data[o] = col[0]; img.data[o + 1] = col[1]; img.data[o + 2] = col[2]; img.data[o + 3] = col[3]; }
+    sctx.putImageData(img, 0, 0);
+    hctx.clearRect(0, 0, HEAT.width, HEAT.height); hctx.imageSmoothingEnabled = true; hctx.imageSmoothingQuality = 'high';
+    // cells are centred on grid nodes: shift by half a cell so the texture lines up with lon −180…180, lat 90…−90
+    const cw = HEAT.width / NLON, ch = HEAT.height / (NLAT - 1);
+    hctx.drawImage(small, -cw / 2, -ch / 2, HEAT.width + 0 * cw, HEAT.height + ch);
+    hctx.drawImage(small, HEAT.width - cw / 2, -ch / 2, HEAT.width, HEAT.height + ch);  // wrap the dateline column
+    HEATDATA = hctx.getImageData(0, 0, HEAT.width, HEAT.height).data;
+  }
+
+  // ---------------- 2D map
+  const map = L.map('map', { worldCopyJump: true, minZoom: 2, maxZoom: 9, zoomSnap: 0.5, zoomControl: true, attributionControl: true }).setView([22, 15], 2.5);
+  const gibs = layer => L.tileLayer(`https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${layer}/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg`,
+    { maxNativeZoom: 8, maxZoom: 9, attribution: 'Imagery: NASA GIBS' });
+  let base = gibs('BlueMarble_NextGeneration').addTo(map), tileErrors = 0;
+  function watchBase(b) { b.on('tileerror', () => { if (++tileErrors > 6 && !showLand) { showLand = true; renderHeat(); heat.redraw(); window.dispatchEvent(new Event('af-heat')); } }); }
+  watchBase(base);
+  const Heat = L.GridLayer.extend({
+    createTile(coords) {
+      const tile = document.createElement('canvas'); tile.width = tile.height = 256;
+      if (!HEATDATA) return tile;
+      const ctx = tile.getContext('2d'), img = ctx.createImageData(256, 256), z = Math.pow(2, coords.z) * 256, Wh = HEAT.width, Hh = HEAT.height;
+      for (let py = 0; py < 256; py++) {
+        const Y = coords.y * 256 + py + 0.5, lat = Math.atan(Math.sinh(Math.PI * (1 - 2 * Y / z))) * 180 / Math.PI;
+        const yy = Math.min(Hh - 1, Math.max(0, Math.floor((90 - lat) / 180 * Hh)));
+        for (let px = 0; px < 256; px++) {
+          let lon = (coords.x * 256 + px + 0.5) / z * 360 - 180; lon = ((lon + 180) % 360 + 360) % 360;
+          const xx = Math.min(Wh - 1, Math.floor(lon / 360 * Wh)), s = (yy * Wh + xx) * 4, a = HEATDATA[s + 3]; if (!a) continue;
+          const o = (py * 256 + px) * 4; img.data[o] = HEATDATA[s]; img.data[o + 1] = HEATDATA[s + 1]; img.data[o + 2] = HEATDATA[s + 2]; img.data[o + 3] = a; } }
+      ctx.putImageData(img, 0, 0); return tile; } });
+  const heat = new Heat({ opacity: 0.85, zIndex: 5 }).addTo(map);
+  const knownLayer = L.layerGroup().addTo(map), gemLayer = L.layerGroup().addTo(map), caseLayer = L.layerGroup().addTo(map), selLayer = L.layerGroup().addTo(map);
+  CFG.known_analogs.forEach(k => L.circleMarker([k.lat, k.lon], { radius: 7, color: '#fff', weight: 2, fill: false })
+    .bindTooltip(k.name + ' · well-known analog').on('click', e => { L.DomEvent.stopPropagation(e); openCard(k.lat, k.lon, { title: k.name, kind: 'Well-known analog site' }); }).addTo(knownLayer));
+  CFG.case_studies.forEach(c => L.marker([c.lat, c.lon], { icon: L.divIcon({ className: '', html: '<div class="lbl-case"></div>', iconSize: [14, 14] }) })
+    .bindTooltip(c.name).on('click', e => { L.DomEvent.stopPropagation(e); openCard(c.lat, c.lon, { title: c.name, kind: c.type + ' · ' + c.analog_of, text: c.text }); }).addTo(caseLayer));
+  map.on('click', e => openCard(e.latlng.lat, ((e.latlng.lng + 540) % 360) - 180));
+  $('basemap').onchange = e => { map.removeLayer(base); tileErrors = 0; base = gibs(e.target.value).addTo(map); base.bringToBack(); watchBase(base);
+    window.dispatchEvent(new CustomEvent('af-basemap', { detail: e.target.value })); };
+
+  // ---------------- place names (OpenStreetMap Nominatim), cached, ≤1 request/s
+  const nameCache = {}; let lastReq = 0;
+  async function placeName(lat, lon) {
+    const key = lat.toFixed(2) + ',' + lon.toFixed(2); if (key in nameCache) return nameCache[key];
+    const pre = (D.gem_names[PID] || {})[lat + ',' + lon]; if (pre) return (nameCache[key] = pre);
+    const wait = Math.max(0, lastReq + 1100 - Date.now()); lastReq = Date.now() + wait; if (wait) await new Promise(r => setTimeout(r, wait));
+    try { const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=6&accept-language=en&lat=${lat}&lon=${lon}`);
+      const j = await r.json(), a = j.address || {}; const s = [a.state || a.region || a.county, a.country].filter(Boolean).join(', ');
+      return (nameCache[key] = s || j.display_name || ''); } catch (e) { return (nameCache[key] = ''); }
+  }
+
+  // ---------------- place card (shared by both views)
+  const fmt = (f, v) => Number.isNaN(v) ? 'n/a' : (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : v.toFixed(2)) + ' ' + FEATS[f].unit;
+  const topTxt = p => { const t = 100 * (1 - p); return 'top ' + (t < 1 ? t.toFixed(2) : t < 10 ? t.toFixed(1) : t.toFixed(0)) + '%'; };
+  let cardSeq = 0;
+  async function openCard(lat, lon, extra = {}) {
+    const seq = ++cardSeq;
+    const excluded = isExcluded(Math.round(lat * 2), Math.round(lon / 0.625));
+    const n = excluded ? null : nearestCell(lat, lon, 150);
+    $('pc').classList.add('open'); $('hint').style.display = 'none';
+    if (!n) { $('pc-kind').textContent = 'Outside analysis coverage'; $('pc-title').textContent = 'No land data here'; $('pc-co').textContent = lat.toFixed(2) + '°, ' + lon.toFixed(2) + '°';
+      $('pc-bd').innerHTML = '<p>This location has no nearby land cell in the current dataset.</p>'; return; }
+    const i = n.i, T = PROF().targets;
+    const feats = Object.keys(T).filter(f => WEIGHTS[f] > 0).map(f => ({ f, m: match(f, i) })).sort((a, b) => b.m - a.m);
+    const nk = CFG.known_analogs.map(k => ({ k, d: hav(LAT[i], LON[i], k.lat, k.lon) })).sort((a, b) => a.d - b.d)[0];
+    $('pc-kind').textContent = extra.kind || 'Selected place';
+    $('pc-title').textContent = extra.title || 'Locating…';
+    $('pc-co').textContent = `${Math.abs(LAT[i]).toFixed(2)}° ${LAT[i] >= 0 ? 'N' : 'S'}, ${Math.abs(LON[i]).toFixed(2)}° ${LON[i] >= 0 ? 'E' : 'W'}`;
+    const holds = feats.filter(x => x.m >= 0.6), breaks = feats.filter(x => x.m < 0.35);
+    $('pc-bd').innerHTML = `${extra.text ? `<p>${extra.text}</p>` : ''}
+      <div class="score"><div class="ring" style="--p:${(100 * SCORE[i]).toFixed(0)}"><b>${SCORE[i].toFixed(2)}</b></div>
+        <div class="t">Similarity to <strong>${PROF().name}</strong><br><strong>${topTxt(SPCT[i])}</strong> of ${comparisonArea}</div></div>
+      ${feats.map(({ f, m }) => `<div class="fb"><span class="l">${FEATS[f].label}</span>
+        <span class="bar" title="match ${(100 * m).toFixed(0)}%"><i style="width:${(100 * m).toFixed(0)}%"></i></span>
+        <span class="v">here ${fmt(f, VAL[f][i])} · target: ${T[f].why}</span></div>`).join('')}
+      <h4>Where the analogy holds</h4><div class="chips">${holds.length ? holds.map(x => `<span class="chip ok">${FEATS[x.f].label}</span>`).join('') : '<span class="muted">—</span>'}</div>
+      <h4>Where it breaks down</h4><div class="chips">${breaks.length ? breaks.map(x => `<span class="chip no">${FEATS[x.f].label}</span>`).join('') : '<span class="muted">No strong mismatch among the measured features</span>'}</div>
+      <h4>What no place on Earth can reproduce</h4><ul>${PROF().earth_limits.map(x => `<li>${x}</li>`).join('')}</ul>
+      <h4>Context</h4><p style="margin:0">Nearest well-known analog: ${nk.k.name} (${Math.round(nk.d).toLocaleString('en')} km away)</p>`;
+    $('pc-bd').scrollTop = 0;
+    selLayer.clearLayers(); L.marker([LAT[i], LON[i]], { interactive: false, icon: L.divIcon({ className: '', html: '<div class="sel-ring"></div>', iconSize: [30, 30] }) }).addTo(selLayer);
+    window.dispatchEvent(new CustomEvent('af-select', { detail: { lat: LAT[i], lon: LON[i] } }));
+    if (!extra.title) { const nm = await placeName(LAT[i], LON[i]); if (seq === cardSeq) $('pc-title').textContent = nm || `${LAT[i].toFixed(1)}°, ${LON[i].toFixed(1)}°`; }
+  }
+  $('pc-x').onclick = () => { $('pc').classList.remove('open'); selLayer.clearLayers(); window.dispatchEvent(new CustomEvent('af-select', { detail: null })); };
+
+  // ---------------- sidebar
+  function renderTargets() {
+    const box = $('targets'); box.innerHTML = '';
+    for (const [pid, p] of Object.entries(CFG.profiles)) { const [body, title] = p.name.split(' · ');
+      const b = document.createElement('button'); b.className = 'tbtn' + (pid === PID ? ' on' : ''); b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', pid === PID);
+      b.innerHTML = `<span class="body"><span class="dot" style="background:${PCOL[pid] || '#888'}"></span>${body}</span><span class="ttl">${title}</span>`;
+      b.onclick = () => selectProfile(pid); box.appendChild(b); }
+    $('psummary').textContent = PROF().summary; $('pexamples').textContent = 'Examples: ' + PROF().examples;
+    $('legtitle').textContent = 'Similarity to ' + PROF().name;
+  }
+  function renderSliders() {
+    const box = $('sliders'); box.innerHTML = '';
+    for (const [f, t] of Object.entries(PROF().targets)) { const row = document.createElement('div'); row.className = 'slider';
+      row.innerHTML = `<span class="nm">${FEATS[f].label}<span class="why">${t.why}</span></span>
+        <input type="range" min="0" max="3" step="0.5" value="${WEIGHTS[f]}" aria-label="Weight of ${FEATS[f].label}"><span class="wv">${WEIGHTS[f]}</span>`;
+      const inp = row.querySelector('input'), wv = row.querySelector('.wv');
+      inp.oninput = () => { WEIGHTS[f] = +inp.value; wv.textContent = inp.value; scheduleUpdate(); }; box.appendChild(row); }
+  }
+  function renderValidation() {
+    const tagged = CFG.known_analogs.filter(k => k.profiles.includes(PID)), ranks = [];
+    const rows = tagged.map(k => { const n = nearestCell(k.lat, k.lon, 150); if (!n) return `<div class="row"><span>${k.name}</span><span class="r">no data</span></div>`;
+      ranks.push(SPCT[n.i]); return `<div class="row"><span>${k.name}</span><span class="r">${topTxt(SPCT[n.i])}</span></div>`; });
+    ranks.sort((a, b) => a - b); const med = ranks.length ? ranks[Math.floor((ranks.length - 1) / 2)] : NaN;
+    $('valbig').textContent = Number.isNaN(med) ? '–' : topTxt(med);
+    $('vallist').innerHTML = rows.join('') || '<div class="row">No reference sites for this target.</div>';
+  }
+  function flyToGem(i, k) {
+    if (document.body.classList.contains('view-globe')) window.dispatchEvent(new CustomEvent('af-fly', { detail: { lat: LAT[i], lon: LON[i] } }));
+    else map.flyTo([LAT[i], LON[i]], 5, { duration: 1.2 });
+    openCard(LAT[i], LON[i], { kind: 'Hidden gem #' + (k + 1) + ' · ' + PROF().name });
+  }
+  function renderGems() {
+    gemLayer.clearLayers(); const box = $('gems'); box.innerHTML = '';
+    GEMS.forEach((i, k) => { const el = document.createElement('div'); el.className = 'gem'; el.tabIndex = 0;
+      el.innerHTML = `<span class="num">${k + 1}</span><span><span class="loc" data-i="${i}">${LAT[i].toFixed(1)}°, ${LON[i].toFixed(1)}°</span><br>
+        <span class="co">${topTxt(SPCT[i])} of ${comparisonArea}</span></span><span class="sc">${SCORE[i].toFixed(2)}</span>`;
+      el.onclick = () => flyToGem(i, k); el.onkeydown = e => { if (e.key === 'Enter') flyToGem(i, k); }; box.appendChild(el);
+      L.marker([LAT[i], LON[i]], { icon: L.divIcon({ className: '', html: `<div class="lbl-gem">${k + 1}</div>`, iconSize: [24, 24] }) })
+        .bindTooltip('Hidden gem #' + (k + 1)).on('click', e => { L.DomEvent.stopPropagation(e); flyToGem(i, k); }).addTo(gemLayer); });
+    (async () => { const pid = PID; for (const i of GEMS) { if (pid !== PID) return; const nm = await placeName(LAT[i], LON[i]);
+      const s = box.querySelector(`.loc[data-i="${i}"]`); if (s && nm) s.textContent = nm; } })();
+  }
+
+  let timer = null;
+  function scheduleUpdate() { clearTimeout(timer); timer = setTimeout(update, 120); }
+  function update() { compute(); renderHeat(); heat.redraw(); renderValidation(); renderGems(); listeners.forEach(f => f()); }
+  function selectProfile(pid) { PID = pid; WEIGHTS = {}; for (const [f, t] of Object.entries(PROF().targets)) WEIGHTS[f] = t.w;
+    $('pc').classList.remove('open'); selLayer.clearLayers(); renderTargets(); renderSliders(); update();
+    window.AFX && (window.AFX.pid = PID); window.dispatchEvent(new CustomEvent('af-profile', { detail: PID })); }
+  $('reset').onclick = () => selectProfile(PID);
+  $('planet-min').onclick = () => { const p = $('planet'); p.classList.toggle('collapsed'); $('planet-min').textContent = p.classList.contains('collapsed') ? '+' : '–'; };
+  const LAYERS = { heat: true, known: true, gems: true, case: true };
+  const tog = (id, key, layer) => $(id).onchange = e => { LAYERS[key] = e.target.checked; e.target.checked ? layer.addTo(map) : map.removeLayer(layer); listeners.forEach(f => f()); };
+  tog('t-heat', 'heat', heat); tog('t-known', 'known', knownLayer); tog('t-gems', 'gems', gemLayer); tog('t-case', 'case', caseLayer);
+
+  // ---------------- view switch
+  function setView(v) { document.body.classList.toggle('view-globe', v === 'globe'); document.body.classList.toggle('view-map', v !== 'globe');
+    $('v-map').classList.toggle('on', v !== 'globe'); $('v-globe').classList.toggle('on', v === 'globe');
+    $('v-map').setAttribute('aria-selected', v !== 'globe'); $('v-globe').setAttribute('aria-selected', v === 'globe');
+    try { history.replaceState(null, '', v === 'globe' ? '#globe' : '#map'); } catch (e) {}
+    if (v === 'globe') { const go = () => window.AFX && window.AFX.initGlobe ? window.AFX.initGlobe() : setTimeout(go, 100); go(); }
+    else setTimeout(() => map.invalidateSize(), 50); }
+  $('v-map').onclick = () => setView('map'); $('v-globe').onclick = () => setView('globe');
+  window.addEventListener('hashchange', () => setView(location.hash === '#globe' ? 'globe' : 'map'));
+
+  // ---------------- API for the 3D globe module
+  window.AFX = { pid: PID, CFG, HEAT, LAYERS, onUpdate: f => listeners.push(f), get gems() { return GEMS; }, LAT, LON,
+    openCard, basemap: () => $('basemap').value, get showLand() { return showLand; }, setShowLand(v) { if (v !== showLand) { showLand = v; renderHeat(); heat.redraw(); } } };
+  selectProfile(PID);
+  if (location.hash === '#globe') setView('globe');
+});
+</script>
+
+<script>
+// DESIGN PREVIEW ONLY: synthetic demo values derived from NASA Blue Marble colours (not NASA POWER results)
+(async () => {
+  const CFG = {"features": {"precip": {"label": "Precipitation", "unit": "mm/day", "source": "NASA POWER · PRECTOTCORR (MERRA-2 / GPM-corrected)"}, "soil": {"label": "Topsoil wetness", "unit": "0–1", "source": "NASA POWER · GWETTOP (MERRA-2)"}, "rh": {"label": "Relative humidity", "unit": "%", "source": "NASA POWER · RH2M (MERRA-2)"}, "tmean": {"label": "Mean air temperature", "unit": "°C", "source": "NASA POWER · T2M (MERRA-2)"}, "tmin": {"label": "Minimum air temperature at 2 m", "unit": "°C", "source": "NASA POWER · T2M_MIN (annual climatology field ANN, MERRA-2)"}, "diurnal": {"label": "Day–night temperature swing", "unit": "°C", "source": "NASA POWER · T2M_RANGE (MERRA-2)"}, "seasonal": {"label": "Seasonal temperature swing", "unit": "°C", "source": "NASA POWER · T2M monthly (MERRA-2)"}, "albedo": {"label": "Surface albedo", "unit": "0–1", "source": "NASA POWER · ALLSKY_SRF_ALB (CERES SYN1deg)"}, "wind": {"label": "Wind speed (10 m)", "unit": "m/s", "source": "NASA POWER · WS10M (MERRA-2)"}, "frost": {"label": "Frost days", "unit": "days/yr", "source": "NASA POWER · FROST_DAYS (MERRA-2)"}, "elev": {"label": "Elevation", "unit": "m", "source": "Derived from NASA POWER · PS (surface pressure)"}}, "profiles": {"mars_equatorial": {"name": "Mars · Equatorial landing sites", "examples": "Jezero Crater (Perseverance), Gale Crater (Curiosity)", "summary": "Hyper-arid, dusty, cold surface with very large day–night temperature swings and a mid-toned reddish surface (global Bond albedo ≈ 0.25).", "targets": {"precip": {"pct": 0.0, "w": 3.0, "why": "No rain on Mars today"}, "soil": {"pct": 0.0, "w": 3.0, "why": "Desiccated regolith"}, "rh": {"pct": 0.0, "w": 2.0, "why": "Extremely dry atmosphere"}, "diurnal": {"pct": 1.0, "w": 2.0, "why": "Thin air → huge day–night swing"}, "albedo": {"value": 0.25, "w": 1.5, "why": "Mars global albedo ≈ 0.25"}, "tmean": {"pct": 0.15, "w": 1.0, "why": "Mean surface temperature ≈ −60 °C"}, "frost": {"pct": 0.7, "w": 0.5, "why": "Nightly frost is common"}, "wind": {"pct": 0.6, "w": 0.5, "why": "Wind-driven dust and dunes"}, "elev": {"pct": 0.85, "w": 0.5, "why": "Thin air, strong UV at altitude"}}, "earth_limits": ["Gravity: Earth 1 g vs Mars 0.38 g", "Air pressure: Mars has <1% of Earth's surface pressure", "No global magnetic field or thick atmosphere on Mars → much higher surface radiation", "Martian soil contains perchlorates; even the driest Earth deserts host microbes"]}, "mars_periglacial": {"name": "Mars · Mid-latitude ground ice", "examples": "Arcadia Planitia, Utopia Planitia (candidate human landing regions with shallow ice)", "summary": "Cold, dry plains with ice in the ground, strong seasons and repeated freezing — but bare ground, not snow cover.", "targets": {"tmean": {"pct": 0.03, "w": 2.0, "why": "Permanently frozen ground"}, "frost": {"pct": 0.95, "w": 2.0, "why": "Freeze–thaw / frost almost all year"}, "precip": {"pct": 0.05, "w": 2.0, "why": "Polar-desert dryness"}, "tmin": {"pct": 0.02, "w": 1.0, "why": "Extreme winter cold"}, "rh": {"pct": 0.15, "w": 1.0, "why": "Dry air"}, "soil": {"pct": 0.3, "w": 1.0, "why": "Ice in the ground, little liquid water"}, "albedo": {"value": 0.3, "w": 1.0, "why": "Bare ground, not bright snow"}, "seasonal": {"pct": 0.95, "w": 1.0, "why": "Strong seasonal cycle"}, "wind": {"pct": 0.6, "w": 0.5, "why": "Wind-sculpted surfaces"}}, "earth_limits": ["Liquid water is not stable on the Martian surface; ice sublimates instead of melting", "Gravity: Earth 1 g vs Mars 0.38 g", "Mars has <1% of Earth's air pressure and much higher radiation"]}, "moon_south_pole": {"name": "Moon · South-pole base region", "examples": "Shackleton crater rim and other Artemis candidate regions", "summary": "Extreme cold, no air or wind, rugged high-relief terrain, dark regolith (albedo ≈ 0.12), possible water ice in shadowed craters.", "targets": {"tmean": {"pct": 0.0, "w": 3.0, "why": "Among the coldest places in the Solar System"}, "tmin": {"pct": 0.0, "w": 2.0, "why": "Shadowed craters below −200 °C"}, "precip": {"pct": 0.0, "w": 2.0, "why": "No atmosphere, no precipitation"}, "wind": {"pct": 0.0, "w": 1.5, "why": "No air → no wind"}, "rh": {"pct": 0.0, "w": 1.0, "why": "No atmosphere"}, "albedo": {"value": 0.12, "w": 1.0, "why": "Dark lunar regolith (≈ 0.12)"}, "elev": {"pct": 0.95, "w": 1.0, "why": "Rugged crater rims and massifs"}}, "earth_limits": ["The Moon is a vacuum: no air, no weather, no sound", "Gravity: Earth 1 g vs Moon 0.17 g", "Permanently shadowed lunar craters are colder than anywhere on Earth", "Sun stays near the horizon for months at the lunar poles"]}, "moon_mare": {"name": "Moon · Basaltic mare plains", "examples": "Mare Tranquillitatis (Apollo 11), Oceanus Procellarum", "summary": "Dark volcanic (basaltic) plains: very low albedo (≈ 0.07), bone-dry, no wind, enormous day–night temperature swings.", "targets": {"albedo": {"value": 0.07, "w": 3.0, "why": "Mare basalt is very dark (≈ 0.07)"}, "precip": {"pct": 0.0, "w": 2.0, "why": "No water cycle"}, "soil": {"pct": 0.0, "w": 2.0, "why": "Completely dry regolith"}, "diurnal": {"pct": 1.0, "w": 2.0, "why": "Lunar day–night swing ≈ 250 °C"}, "rh": {"pct": 0.1, "w": 1.0, "why": "No atmosphere"}, "wind": {"pct": 0.1, "w": 1.0, "why": "No wind erosion"}}, "earth_limits": ["Vacuum and 0.17 g on the Moon", "Lunar regolith is made by micrometeorite impacts, not by wind and water", "Earth basalts are chemically weathered by water and oxygen"]}}, "known_analogs": [{"name": "Atacama Desert, Chile", "lat": -24.1, "lon": -69.9, "profiles": ["mars_equatorial"]}, {"name": "McMurdo Dry Valleys, Antarctica", "lat": -77.5, "lon": 161.8, "profiles": ["mars_periglacial", "moon_south_pole"]}, {"name": "Haughton Crater, Devon Island, Canada", "lat": 75.4, "lon": -89.7, "profiles": ["mars_periglacial", "moon_south_pole"]}, {"name": "Death Valley, USA", "lat": 36.5, "lon": -117.1, "profiles": ["mars_equatorial"]}, {"name": "Mars Desert Research Station, Utah, USA", "lat": 38.4, "lon": -110.8, "profiles": ["mars_equatorial"]}, {"name": "Mojave Desert, USA", "lat": 35.0, "lon": -115.5, "profiles": ["mars_equatorial"]}, {"name": "Rio Tinto, Spain", "lat": 37.7, "lon": -6.6, "profiles": ["mars_equatorial"]}, {"name": "Svalbard, Norway", "lat": 79.4, "lon": 13.3, "profiles": ["mars_periglacial"]}, {"name": "Icelandic Highlands", "lat": 64.9, "lon": -17.0, "profiles": ["moon_mare", "mars_equatorial"]}, {"name": "Mauna Kea, Hawaii, USA", "lat": 19.8, "lon": -155.5, "profiles": ["moon_mare"]}, {"name": "Lanzarote, Canary Islands, Spain", "lat": 29.0, "lon": -13.7, "profiles": ["moon_mare"]}, {"name": "Meteor Crater, Arizona, USA", "lat": 35.0, "lon": -111.0, "profiles": ["moon_mare"]}, {"name": "Ries Crater, Germany", "lat": 48.9, "lon": 10.6, "profiles": []}, {"name": "Sudbury Basin, Canada", "lat": 46.6, "lon": -81.2, "profiles": []}, {"name": "Pilbara, Australia", "lat": -21.2, "lon": 119.0, "profiles": ["mars_equatorial"]}, {"name": "Namib Desert, Namibia", "lat": -24.0, "lon": 15.5, "profiles": ["mars_equatorial"]}, {"name": "Ladakh, India", "lat": 34.2, "lon": 77.6, "profiles": ["mars_periglacial", "mars_equatorial"]}, {"name": "Qaidam Basin, Tibetan Plateau, China", "lat": 37.5, "lon": 93.5, "profiles": ["mars_equatorial"]}, {"name": "Arkaroola, Australia", "lat": -30.3, "lon": 139.3, "profiles": ["mars_equatorial"]}], "case_studies": [{"name": "Kryvyi Rih iron basin (Kryvbas), Ukraine", "lat": 47.91, "lon": 33.39, "analog_of": "Mars · Meridiani Planum hematite", "type": "Mineralogical analog", "text": "Precambrian banded iron formation with hematite quartzites. Banded iron formations are proposed terrestrial analogs for the hematite deposits found by the Opportunity rover at Meridiani Planum — evidence of ancient water on Mars. Climate does NOT match (temperate, vegetated), which our tool shows honestly: this is a mineral/process analog, not an environmental one."}, {"name": "Boltysh impact crater, Ukraine", "lat": 48.75, "lon": 32.17, "analog_of": "Moon & Mars · complex impact craters", "type": "Process analog", "text": "A buried ~24 km impact crater with a ~6 km central uplift, formed ~65 million years ago. Drill cores preserve the impact melt sheet and crater-lake sediments — useful for understanding how impacts shape and heat planetary crusts, and how crater lakes record past environments (as at Jezero Crater on Mars)."}, {"name": "Oleshky Sands, Ukraine (approx.)", "lat": 46.55, "lon": 32.95, "analog_of": "Mars · aeolian dune fields", "type": "Process analog", "text": "One of Europe's largest inland sand massifs, shaped by wind. A test bed for studying dune migration with satellite imagery — the same remote-sensing approach used for Martian dunes. Today it can only be studied remotely, which is exactly how we study Mars."}]};
+  const W = 576, H = 361;
+  const img = await new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = rej;
+    i.src = 'https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=BlueMarble_NextGeneration&STYLES=&FORMAT=image/jpeg&CRS=EPSG:4326&BBOX=-90.25,-180.3125,90.25,179.6875&WIDTH=' + W + '&HEIGHT=' + H; });
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d'); g.drawImage(img, 0, 0); const px = g.getImageData(0, 0, W, H).data;
+  const lat = [], lon = [], V = { precip: [], soil: [], rh: [], tmean: [], tmin: [], diurnal: [], seasonal: [], albedo: [], wind: [], frost: [], elev: [] };
+  const scale = { precip: 100, soil: 1000, rh: 10, tmean: 10, tmin: 10, diurnal: 10, seasonal: 10, albedo: 1000, wind: 100, frost: 10, elev: 1 };
+  const cl = v => Math.max(0, Math.min(1, v));
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const o = (y * W + x) * 4, r = px[o], gg = px[o + 1], b = px[o + 2];
+    const la = 90 - y * 0.5, lo = -180 + x * 0.625, bright = (r + gg + b) / 3, ice = bright > 170 && Math.abs(r - b) < 35, water = !ice && b > r + 8 && b >= gg - 8; if (water) continue;
+    const desert = cl((r - gg + 12) / 38) * cl((bright - 70) / 90), veg = cl((gg - r + 6) / 22);
+    const tmean = ice ? -28 - Math.max(0, Math.abs(la) - 70) * 0.7 : 28 - 0.5 * Math.abs(la) - veg * 3;
+    const v = { precip: ice ? 0.25 : 0.03 + 3.6 * veg + 0.8 * (1 - desert) * (1 - veg), soil: ice ? 1 : 0.04 + 0.85 * veg + 0.25 * (1 - desert) * (1 - veg), rh: ice ? 72 : 15 + 60 * veg + 25 * (1 - desert) * (1 - veg),
+      tmean, tmin: tmean - 8 - Math.abs(la) * 0.45, diurnal: ice ? 7 : 6 + 15 * desert, seasonal: 2 + Math.abs(la) * 0.55, albedo: Math.min(0.85, bright / 255 * 0.8),
+      wind: 3 + 2 * desert + (ice ? 3 : 0), frost: Math.max(0, Math.min(365, (6 - tmean) * 22)), elev: ice ? 2400 : 250 + 700 * desert };
+    lat.push(Math.round(la * 2)); lon.push(Math.round(lo / 0.625)); for (const k in V) V[k].push(Math.round(v[k] * scale[k])); }
+  window.ANALOG_DATA = { grid: { dlat: 0.5, dlon: 0.625 }, lat, lon, scale, values: V, config: CFG, sigma: 0.25, gem_spacing_km: 400, novelty_km: 300, n_gems: 12, gem_names: {}, generated: 'design preview', test_mode: false, preview: true };
+  const go = () => window.L && window.__afMain ? window.__afMain() : setTimeout(go, 50); go();
+})();
+</script>
+<script type="module">
+// ---------------- 3D globe (three.js), loaded on first use
+const AFX = await (async () => { for (let k = 0; k < 600 && !window.AFX; k++) await new Promise(r => setTimeout(r, 100)); return window.AFX; })();
+if (AFX) AFX.initGlobe = (() => { let started = false; return () => { if (started) return; started = true; init().catch(e => {
+  document.getElementById('gload').textContent = '3D globe could not load (needs internet for three.js): ' + e.message; }); }; })();
+
+async function init() {
+  const THREE = await import('three');
+  const { OrbitControls } = await import('three/addons/controls/OrbitControls.js');
+  const host = document.getElementById('globe');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.outputColorSpace = THREE.SRGBColorSpace;
+  host.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 200); camera.position.set(0.9, 1.1, 3.0);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  Object.assign(controls, { enableDamping: true, dampingFactor: 0.06, rotateSpeed: 0.5, zoomSpeed: 0.7, minDistance: 1.35, maxDistance: 6, enablePan: false, autoRotate: true, autoRotateSpeed: 0.45 });
+  controls.addEventListener('start', () => { controls.autoRotate = false; });
+
+  // light: soft ambient + "sun" so the globe has a gentle terminator
+  scene.add(new THREE.AmbientLight(0xffffff, 1.6));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(5, 2, 3); scene.add(sun);
+
+  const R = 1, seg = 160;
+  const earthMat = new THREE.MeshPhongMaterial({ color: 0x1a2a40, shininess: 6, specular: 0x111111 });
+  const earth = new THREE.Mesh(new THREE.SphereGeometry(R, seg, seg), earthMat); scene.add(earth);
+  const loader = new THREE.TextureLoader(); loader.setCrossOrigin('anonymous');
+  function loadBase(layer) {
+    const url = `https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=${layer}&STYLES=&FORMAT=image/jpeg&CRS=EPSG:4326&BBOX=-90,-180,90,180&WIDTH=4096&HEIGHT=2048`;
+    loader.load(url, tex => { tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      earthMat.map = tex; earthMat.color.set(0xffffff); earthMat.needsUpdate = true; document.getElementById('gload').style.display = 'none'; },
+      undefined, () => { AFX.setShowLand(true); heatTex.needsUpdate = true; document.getElementById('gload').style.display = 'none'; });
+  }
+  loadBase(AFX.basemap());
+  window.addEventListener('af-basemap', e => loadBase(e.detail));
+
+  const heatTex = new THREE.CanvasTexture(AFX.HEAT); heatTex.colorSpace = THREE.SRGBColorSpace; heatTex.anisotropy = 8;
+  const heatMesh = new THREE.Mesh(new THREE.SphereGeometry(R * 1.003, seg, seg), new THREE.MeshBasicMaterial({ map: heatTex, transparent: true, depthWrite: false, opacity: 0.85 }));
+  scene.add(heatMesh);
+
+  // atmosphere glow (fresnel rim)
+  const atmo = new THREE.Mesh(new THREE.SphereGeometry(R * 1.07, 96, 96), new THREE.ShaderMaterial({
+    side: THREE.BackSide, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false,
+    vertexShader: 'varying vec3 vN; varying vec3 vP; void main(){ vN = normalize(normalMatrix*normal); vec4 p = modelViewMatrix*vec4(position,1.0); vP = p.xyz; gl_Position = projectionMatrix*p; }',
+    fragmentShader: 'varying vec3 vN; varying vec3 vP; void main(){ float i = pow(max(0.0, 0.64 - dot(vN, normalize(-vP))), 4.5); gl_FragColor = vec4(0.36,0.62,1.0,1.0)*i*2.0; }' }));
+  scene.add(atmo);
+
+  // stars
+  const sg = new THREE.BufferGeometry(), sp = new Float32Array(4500 * 3);
+  for (let i = 0; i < 4500; i++) { const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, r = 60 + Math.random() * 30, s = Math.sqrt(1 - u * u);
+    sp[i * 3] = r * s * Math.cos(a); sp[i * 3 + 1] = r * u; sp[i * 3 + 2] = r * s * Math.sin(a); }
+  sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
+  scene.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 0.18, sizeAttenuation: true, transparent: true, opacity: 0.75 })));
+
+  // lat/lon <-> 3D (matches three.js SphereGeometry UVs for an equirectangular texture)
+  const toXYZ = (lat, lon, r) => { const phi = (lon + 180) / 360 * Math.PI * 2, th = (90 - lat) / 180 * Math.PI;
+    return new THREE.Vector3(-r * Math.cos(phi) * Math.sin(th), r * Math.cos(th), r * Math.sin(phi) * Math.sin(th)); };
+  const toLatLon = v => { const r = v.length(), th = Math.acos(v.y / r); let phi = Math.atan2(v.z, -v.x); if (phi < 0) phi += Math.PI * 2;
+    return { lat: 90 - th * 180 / Math.PI, lon: phi / (Math.PI * 2) * 360 - 180 }; };
+
+  // markers as sprites drawn on small canvases
+  function spriteTex(kind, label) { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+    if (kind === 'gem') { g.fillStyle = '#1baf7a'; g.beginPath(); g.arc(64, 64, 46, 0, 7); g.fill(); g.lineWidth = 10; g.strokeStyle = '#0b0d10'; g.stroke();
+      g.fillStyle = '#fff'; g.font = '700 54px Inter, system-ui'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(label, 64, 68); }
+    else if (kind === 'known') { g.strokeStyle = '#fff'; g.lineWidth = 12; g.beginPath(); g.arc(64, 64, 40, 0, 7); g.stroke(); }
+    else if (kind === 'case') { g.translate(64, 64); g.rotate(Math.PI / 4); g.fillStyle = '#eda100'; g.fillRect(-34, -34, 68, 68); g.lineWidth = 8; g.strokeStyle = '#0b0d10'; g.strokeRect(-34, -34, 68, 68); }
+    else if (kind === 'sel') { g.strokeStyle = '#fff'; g.lineWidth = 8; g.beginPath(); g.arc(64, 64, 54, 0, 7); g.stroke(); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+  const groups = { known: new THREE.Group(), gems: new THREE.Group(), case: new THREE.Group() }; Object.values(groups).forEach(g => scene.add(g));
+  function addSprite(group, kind, lat, lon, size, data, label) {
+    const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteTex(kind, label), depthTest: false, transparent: true }));
+    s.position.copy(toXYZ(lat, lon, R * 1.012)); s.scale.setScalar(size); s.userData = data; s.renderOrder = 10; group.add(s); return s; }
+  AFX.CFG.known_analogs.forEach(k => addSprite(groups.known, 'known', k.lat, k.lon, 0.045, { lat: k.lat, lon: k.lon, extra: { title: k.name, kind: 'Well-known analog site' } }));
+  AFX.CFG.case_studies.forEach(c => addSprite(groups.case, 'case', c.lat, c.lon, 0.045, { lat: c.lat, lon: c.lon, extra: { title: c.name, kind: c.type + ' · ' + c.analog_of, text: c.text } }));
+  function rebuildGems() { groups.gems.clear(); AFX.gems.forEach((i, k) => addSprite(groups.gems, 'gem', AFX.LAT[i], AFX.LON[i], 0.06, { lat: AFX.LAT[i], lon: AFX.LON[i], extra: { kind: 'Hidden gem #' + (k + 1) } }, String(k + 1))); }
+  rebuildGems();
+  let sel = null;
+  window.addEventListener('af-select', e => { if (sel) { scene.remove(sel); sel = null; } if (e.detail) { sel = new THREE.Sprite(new THREE.SpriteMaterial({ map: spriteTex('sel'), depthTest: false, transparent: true }));
+    sel.position.copy(toXYZ(e.detail.lat, e.detail.lon, R * 1.012)); sel.scale.setScalar(0.07); sel.renderOrder = 11; scene.add(sel); } });
+
+  AFX.onUpdate(() => { heatTex.needsUpdate = true; heatMesh.visible = AFX.LAYERS.heat; groups.known.visible = AFX.LAYERS.known; groups.case.visible = AFX.LAYERS.case; groups.gems.visible = AFX.LAYERS.gems; rebuildGems(); });
+  window.addEventListener('af-heat', () => { heatTex.needsUpdate = true; });
+
+  // fly the camera to a place
+  let fly = null;
+  function flyTo(lat, lon) { controls.autoRotate = false; const dist = Math.min(camera.position.length(), 2.4);
+    fly = { from: camera.position.clone().normalize(), to: toXYZ(lat, lon, 1).normalize(), d0: camera.position.length(), d1: dist, t: 0 }; }
+  window.addEventListener('af-fly', e => flyTo(e.detail.lat, e.detail.lon));
+
+  // picking
+  const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(); let down = null;
+  renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+  renderer.domElement.addEventListener('pointerup', e => {
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return; const r = renderer.domElement.getBoundingClientRect();
+    ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ptr, camera);
+    const vis = [...groups.gems.children, ...groups.case.children, ...groups.known.children].filter(s => s.visible && s.parent.visible);
+    const hitS = ray.intersectObjects(vis, false).find(h => h.object.position.clone().normalize().dot(camera.position.clone().normalize()) > 0.15);
+    if (hitS) { const d = hitS.object.userData; AFX.openCard(d.lat, d.lon, d.extra); flyTo(d.lat, d.lon); return; }
+    const hit = ray.intersectObject(earth, false)[0]; if (hit) { const ll = toLatLon(hit.point); AFX.openCard(ll.lat, ll.lon); } });
+
+  // render loop
+  const camDir = new THREE.Vector3();
+  function resize() { const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); renderer.domElement.style.width = w + 'px'; renderer.domElement.style.height = h + 'px'; camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  new ResizeObserver(resize).observe(host); resize();
+  renderer.setAnimationLoop(() => {
+    if (fly) { fly.t = Math.min(1, fly.t + 0.022); const k = fly.t < 0.5 ? 2 * fly.t * fly.t : 1 - Math.pow(-2 * fly.t + 2, 2) / 2;
+      const dir = fly.from.clone().lerp(fly.to, k).normalize(); camera.position.copy(dir.multiplyScalar(fly.d0 + (fly.d1 - fly.d0) * k)); if (fly.t >= 1) fly = null; }
+    controls.update(); camDir.copy(camera.position).normalize();
+    for (const g of Object.values(groups)) for (const s of g.children) s.material.opacity = s.position.clone().normalize().dot(camDir) > 0.12 ? 1 : 0;
+    if (sel) sel.material.opacity = 0.6 + 0.4 * Math.sin(performance.now() / 250);
+    renderer.render(scene, camera);
+  });
+}
+</script>
+
+<script src="planetary-targets.js"></script>
+<script type="module">
+// ---------------- Target planet: realistic Mars / Moon from NASA Trek mosaics (Viking MDIM 2.1 colour, LRO WAC)
+import * as THREE from 'three';
+const AFX = await (async () => { for (let k = 0; k < 600 && !window.AFX; k++) await new Promise(r => setTimeout(r, 100)); return window.AFX; })();
+const SITES = window.PLANETARY_TARGETS;
+const MOSAIC = {
+  mars: 'https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/',
+  moon: 'https://trek.nasa.gov/tiles/Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02/1.0.0/default/default028mm/'
+};
+const FALLBACK = { mars: 0xb5603a, moon: 0x8d8f94 };
+const canvas = document.getElementById('planet-canvas');
+if (AFX && canvas) {
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setSize(250, 250, false); renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50); camera.position.set(0, 0, 4.55);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  const key = new THREE.DirectionalLight(0xfff4ea, 2.1); key.position.set(-2.5, 1.6, 3.2); scene.add(key);
+  const pivot = new THREE.Group(); scene.add(pivot);
+  const mat = new THREE.MeshStandardMaterial({ color: FALLBACK.mars, roughness: 1, metalness: 0 });
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(1, 128, 128), mat); pivot.add(ball);
+  const rimMat = new THREE.ShaderMaterial({ side: THREE.BackSide, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, uniforms: { c: { value: new THREE.Color(0xff8a5c) }, k: { value: 1 } },
+    vertexShader: 'varying vec3 vN; varying vec3 vP; void main(){ vN=normalize(normalMatrix*normal); vec4 p=modelViewMatrix*vec4(position,1.0); vP=p.xyz; gl_Position=projectionMatrix*p; }',
+    fragmentShader: 'uniform vec3 c; uniform float k; varying vec3 vN; varying vec3 vP; void main(){ float i=pow(max(0.0,0.62-dot(vN,normalize(-vP))),4.0); gl_FragColor=vec4(c,1.0)*i*2.2*k; }' });
+  const rim = new THREE.Mesh(new THREE.SphereGeometry(1.05, 64, 64), rimMat); scene.add(rim);
+  const toXYZ = (lat, lon, r) => { const phi = (lon + 180) / 360 * Math.PI * 2, th = (90 - lat) / 180 * Math.PI;
+    return new THREE.Vector3(-r * Math.cos(phi) * Math.sin(th), r * Math.cos(th), r * Math.sin(phi) * Math.sin(th)); };
+  function pin() { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
+    g.fillStyle = 'rgba(235,104,52,.25)'; g.beginPath(); g.arc(64, 64, 58, 0, 7); g.fill();
+    g.fillStyle = '#eb6834'; g.beginPath(); g.arc(64, 64, 26, 0, 7); g.fill(); g.lineWidth = 9; g.strokeStyle = '#fff'; g.stroke();
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
+  const pinTex = pin(), pins = new THREE.Group(); pivot.add(pins);
+
+  const cache = {};
+  function mosaic(body) {
+    if (cache[body]) return cache[body];
+    return cache[body] = new Promise(resolve => {
+      const NX = 8, NY = 4, c = document.createElement('canvas'); c.width = NX * 256; c.height = NY * 256; const g = c.getContext('2d');
+      g.filter = body === 'mars' ? 'sepia(0.35) saturate(1.3) contrast(1.06) brightness(1.06)' : 'grayscale(1) contrast(1.12) brightness(1.08)';
+      let left = NX * NY, ok = 0;
+      for (let y = 0; y < NY; y++) for (let x = 0; x < NX; x++) { const im = new Image(); im.crossOrigin = 'anonymous';
+        im.onload = () => { g.drawImage(im, x * 256, y * 256); ok++; if (--left === 0) done(); };
+        im.onerror = () => { if (--left === 0) done(); };
+        im.src = `${MOSAIC[body]}2/${y}/${x}.jpg`; }
+      function done() { if (ok < NX * NY / 2) return resolve(null); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+        t.anisotropy = renderer.capabilities.getMaxAnisotropy(); resolve(t); }
+    });
+  }
+  let target = new THREE.Quaternion(), turning = false;
+  const siteList = document.getElementById('planet-sites');
+  const formatCoord = (degrees, positive, negative) => degrees === null ? 'any longitude' :
+    Math.abs(degrees) + '° ' + (degrees < 0 ? negative : positive);
+
+  function focusSite(site, index) {
+    const yaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0),
+      -((site.lon ?? 0) + 90) * Math.PI / 180);
+    const tilt = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0),
+      site.lat * Math.PI / 180);
+    target = tilt.multiply(yaw);
+    turning = true;
+    for (const [i, pin] of pins.children.entries()) {
+      pin.scale.setScalar(i === index ? 0.085 : 0.037);
+      siteList.children[i].querySelector('button').setAttribute('aria-pressed', i === index);
+    }
+  }
+
+  async function show(pid) {
+    const S = SITES[pid]; if (!S) return;
+    document.getElementById('planet-k').textContent = 'Target on ' + (S.body === 'mars' ? 'Mars' : 'the Moon');
+    document.getElementById('planet-v').textContent = S.label;
+    document.getElementById('planet-s').textContent = S.sub;
+    const localMap = document.getElementById('planet-local-map');
+    localMap.hidden = !S.localMap;
+    if (S.localMap) localMap.href = S.localMap;
+    rimMat.uniforms.c.value.set(S.body === 'mars' ? 0xffb08a : 0xc9d6ee); rimMat.uniforms.k.value = S.body === 'mars' ? 0.38 : 0.12;
+    for (const pin of pins.children) pin.material.dispose();
+    pins.clear();
+    siteList.replaceChildren();
+    S.sites.forEach((site, index) => {
+      const pin = new THREE.Sprite(new THREE.SpriteMaterial({ map: pinTex, depthTest: true, transparent: true }));
+      pin.position.copy(toXYZ(site.lat, site.lon ?? 0, 1.002));
+      pin.renderOrder = 1;
+      pins.add(pin);
+      const item = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = site.name;
+      button.addEventListener('click', () => focusSite(site, index));
+      const coordinates = document.createElement('span');
+      coordinates.textContent = formatCoord(site.lat, 'N', 'S') + ', ' + formatCoord(site.lon, 'E', 'W');
+      const source = document.createElement('a');
+      source.href = site.source;
+      source.target = '_blank';
+      source.rel = 'noopener noreferrer';
+      source.textContent = 'NASA · ' + site.status;
+      item.append(button, coordinates, source);
+      siteList.append(item);
+    });
+    focusSite(S.sites[0], 0);
+    mat.map = null; mat.color.set(FALLBACK[S.body]); mat.needsUpdate = true;
+    const tex = await mosaic(S.body);
+    if (AFX.pid !== pid) return;
+    if (tex) { mat.map = tex; mat.color.set(0xffffff); mat.needsUpdate = true; }
+  }
+  window.addEventListener('af-profile', e => show(e.detail));
+  show(AFX.pid);
+
+  // Drag to inspect the target; clicking a site recenters it.
+  let drag = null;
+  canvas.addEventListener('pointerdown', e => { drag = [e.clientX, e.clientY]; canvas.setPointerCapture(e.pointerId); turning = false; });
+  canvas.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag[0], dy = e.clientY - drag[1]; drag = [e.clientX, e.clientY];
+    pivot.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), dx * 0.01));
+    pivot.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), dy * 0.01)); });
+  canvas.addEventListener('lostpointercapture', () => { drag = null; });
+  renderer.setAnimationLoop(() => {
+    if (turning) {
+      pivot.quaternion.slerp(target, 0.09);
+      if (pivot.quaternion.angleTo(target) < 0.002) {
+        pivot.quaternion.copy(target);
+        turning = false;
+      }
+    }
+    renderer.render(scene, camera);
+  });
+}
+</script>
+</body>
+</html>

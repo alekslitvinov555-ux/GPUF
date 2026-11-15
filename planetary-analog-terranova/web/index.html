@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Planetary Analog Atlas</title>
+<link rel="stylesheet" href="atlas-home.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
+<script type="module" src="atlas-home.js"></script>
+<body>
+<header><a href="./"><strong>Planetary Analog Atlas</strong></a><a href="finder.html">Advanced Finder ↗</a></header>
+<main>
+  <h1>Find an Earth analog.</h1><p id="hint">Choose the Moon or Mars to compare a mission site with Earth.</p>
+  <div id="worlds">
+    <article data-world="moon"><div class="world" data-globe="moon" role="img" aria-label="Rotatable Moon"></div><a href="finder.html#target=lunar_south_pole" data-pair="moon">The Moon ↗</a></article>
+    <article data-world="earth"><div class="world" data-globe="earth" role="img" aria-label="Rotatable Earth"></div><strong>Earth</strong><small>Reference planet</small></article>
+    <article data-world="mars"><div class="world" data-globe="mars" role="img" aria-label="Rotatable Mars"></div><a href="finder.html#target=jezero_crater" data-pair="mars">Mars ↗</a></article>
+  </div>
+  <section id="work" hidden aria-label="Comparison">
+    <div class="bar"><button id="reset" type="button">← All worlds</button><button id="edit" type="button">Criteria</button></div>
+    <form id="criteria" hidden><h2>What should match?</h2><div id="weights"></div><button class="primary" type="submit">Choose a target →</button></form>
+    <div id="targets" class="choices" hidden></div><p id="status" role="status"></p>
+    <section id="output" hidden><div class="bar"><h2>Earth candidates</h2><a id="advanced" href="finder.html">Terrain and route tools ↗</a></div><div id="candidates" class="choices"></div><div id="evidence"></div></section>
+  </section>
+</main>
+<footer><span>NASA data</span><a href="https://github.com/Yakiyo/terra-nova" target="_blank" rel="noopener">Search engine adapted from TerraNova ↗</a></footer>
+</body></html>

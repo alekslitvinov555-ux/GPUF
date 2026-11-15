@@ -1,0 +1,146 @@
+{
+  "gale_rems": {
+    "airTemperatureC": -46.059,
+    "airTemperatureRangeC": 60.197,
+    "hourlyTemperatureC": [
+      -65.1351,
+      -66.1649,
+      -66.7857,
+      -69.2783,
+      -69.8648,
+      -73.0492,
+      -64.9224,
+      -60.9109,
+      -49.8933,
+      -37.0736,
+      -31.1751,
+      -25.2522,
+      -12.8525,
+      -16.5108,
+      -15.6517,
+      -15.4297,
+      -20.7922,
+      -34.86,
+      -44.7232,
+      -43.087,
+      -52.7361,
+      -52.8458,
+      -56.7929,
+      -59.6384
+    ],
+    "samplesPerHour": [
+      2681,
+      374,
+      278,
+      294,
+      269,
+      278,
+      3021,
+      340,
+      189,
+      177,
+      205,
+      232,
+      163,
+      2533,
+      2986,
+      486,
+      300,
+      300,
+      2931,
+      354,
+      295,
+      293,
+      270,
+      282
+    ],
+    "products": [
+      {
+        "sol": 49,
+        "url": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/msl_rems_bundle/data_calibrated/SOL_00001_00089/SOL00049/RME_401796416RMD00490000000_______PA.TAB",
+        "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/msl_rems_bundle/data_calibrated/SOL_00001_00089/SOL00049/RME_401796416RMD00490000000_______PA.xml",
+        "records": 22200,
+        "sha256": "1ae603a3be60ea8042ed29de45a799b4122033635fbb4818c114a64e832c4aa6"
+      }
+    ],
+    "period": "Curiosity sol 49 (September 2012)",
+    "method": "REMS estimated ambient air temperature. Samples carry both operational-range and reliability flags. The 24 local solar hourly means are equally weighted. Daily swing is the range of those hourly means."
+  },
+  "elysium_twins": {
+    "airTemperatureC": -62.503,
+    "airTemperatureRangeC": 84.006,
+    "period": "InSight sols 675–681 (October 2020)",
+    "method": "NASA InSight weather API. Average the seven valid daily air-temperature means. Daily swing is the average of the daily high minus low. The reported extrema are sampled extrema.",
+    "daily": [
+      {
+        "sol": 675,
+        "start": "2020-10-19T18:32:20Z",
+        "end": "2020-10-20T19:11:55Z",
+        "meanC": -62.314,
+        "minC": -96.872,
+        "maxC": -15.908,
+        "count": 177556
+      },
+      {
+        "sol": 676,
+        "start": "2020-10-20T19:11:55Z",
+        "end": "2020-10-21T19:51:31Z",
+        "meanC": -62.812,
+        "minC": -96.912,
+        "maxC": -16.499,
+        "count": 177554
+      },
+      {
+        "sol": 677,
+        "start": "2020-10-21T19:51:31Z",
+        "end": "2020-10-22T20:31:06Z",
+        "meanC": -63.056,
+        "minC": -97.249,
+        "maxC": -16.853,
+        "count": 177556
+      },
+      {
+        "sol": 678,
+        "start": "2020-10-22T20:31:06Z",
+        "end": "2020-10-23T21:10:41Z",
+        "meanC": -62.562,
+        "minC": -97.728,
+        "maxC": -9.055,
+        "count": 177556
+      },
+      {
+        "sol": 679,
+        "start": "2020-10-23T21:10:41Z",
+        "end": "2020-10-24T21:50:16Z",
+        "meanC": -62.551,
+        "minC": -96.644,
+        "maxC": -11.561,
+        "count": 177554
+      },
+      {
+        "sol": 680,
+        "start": "2020-10-24T21:50:16Z",
+        "end": "2020-10-25T22:29:51Z",
+        "meanC": -61.789,
+        "minC": -96.811,
+        "maxC": -15.298,
+        "count": 168902
+      },
+      {
+        "sol": 681,
+        "start": "2020-10-25T22:29:51Z",
+        "end": "2020-10-26T23:09:26Z",
+        "meanC": -62.434,
+        "minC": -95.447,
+        "maxC": -4.444,
+        "count": 88778
+      }
+    ],
+    "products": [
+      {
+        "url": "https://mars.nasa.gov/rss/api/?feed=weather&category=insight_temperature&feedtype=json&ver=1.0",
+        "sha256": "c5df364deee3545dc76e8e5c87e8edbe745cd68686ecf530a0d15dda5bdb4afd"
+      }
+    ]
+  }
+}

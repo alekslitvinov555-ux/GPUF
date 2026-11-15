@@ -1,0 +1,17 @@
+.git
+.venv
+.uv-cache
+.deps
+node_modules
+.wrangler
+.env
+.env.*
+**/__pycache__
+**/*.pyc
+cache/*
+!cache/predictors.zarr/
+!cache/predictors.zarr/**
+
+.runtime
+.wheelhouse
+dist

@@ -1,0 +1,103 @@
+{
+  "airTemperatureC": -56.684,
+  "airTemperatureRangeC": 50.837,
+  "hourlyTemperatureC": [
+    -71.1891,
+    -72.1579,
+    -75.6539,
+    -77.569,
+    -79.105,
+    -80.908,
+    -78.5811,
+    -72.5859,
+    -61.2304,
+    -56.9399,
+    -45.4048,
+    -41.0418,
+    -36.1503,
+    -30.7142,
+    -30.3962,
+    -30.071,
+    -31.6502,
+    -34.3937,
+    -45.2608,
+    -55.3581,
+    -59.7893,
+    -62.0724,
+    -65.3149,
+    -66.8693
+  ],
+  "solsPerHour": [
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    3,
+    3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    3
+  ],
+  "pressurePa": 757.11,
+  "pressureHours": 24,
+  "temperatureSols": [
+    40,
+    42,
+    43,
+    46
+  ],
+  "pressureSol": 46,
+  "method": "ATS_LOCAL_TEMP1 (mast). Filter missing/nonphysical readings (100\u2013350 K). For each sampled sol, average samples in each local mean solar hour; average each hour equally across sols with observations. Mean and range are calculated across the 24 composite hourly means. Pressure uses nominal BAROCAP1 observations (300\u20131200 Pa) and averages available hourly means on sol 46.",
+  "products": [
+    {
+      "sol": 40,
+      "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0040/WE__0040___________CAL_ATS_________________P01.CSV",
+      "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0040/WE__0040___________CAL_ATS_________________P01.xml",
+      "records": 51684,
+      "sha256": "93b17f6a6fbeb3bbcffb316d3304e0b4f2d450add71f0eebf2caa0a60883538a"
+    },
+    {
+      "sol": 42,
+      "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0042/WE__0042___________CAL_ATS_________________P01.CSV",
+      "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0042/WE__0042___________CAL_ATS_________________P01.xml",
+      "records": 73318,
+      "sha256": "9f4661638dc48e4805c552fdb743f0187610853cfe5849813518bca537f54f79"
+    },
+    {
+      "sol": 43,
+      "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0043/WE__0043___________CAL_ATS_________________P01.CSV",
+      "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0043/WE__0043___________CAL_ATS_________________P01.xml",
+      "records": 77562,
+      "sha256": "cdb4d0848ec763203c963feb8d5dec46f983ca6ab147c8b70e4bead5f687a22a"
+    },
+    {
+      "sol": 46,
+      "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_ATS_________________P01.CSV",
+      "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_ATS_________________P01.xml",
+      "records": 105215,
+      "sha256": "829317f3ee75637499c81f2bacf488c7209dfc135b09d82b0bcaa16dbcf7a673"
+    },
+    {
+      "sol": 46,
+      "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_PS__________________P02.CSV",
+      "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_PS__________________P02.xml",
+      "records": 52406,
+      "sha256": "906c7e543e29a4cbaa824c7fd76f372e8d411b5778c764906199251e164b4d8e"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "planetary-analog-atlas",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "cloudflare:dev": "wrangler dev",
+    "build": "node scripts/build-cloudflare.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "0.3.7"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

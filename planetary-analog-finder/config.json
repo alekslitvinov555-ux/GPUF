@@ -1,0 +1,931 @@
+{
+  "features": {
+    "precip": {
+      "label": "Precipitation",
+      "unit": "mm/day",
+      "source": "NASA POWER · PRECTOTCORR (MERRA-2 / GPM-corrected)"
+    },
+    "soil": {
+      "label": "Topsoil wetness",
+      "unit": "0–1",
+      "source": "NASA POWER · GWETTOP (MERRA-2)"
+    },
+    "rh": {
+      "label": "Relative humidity",
+      "unit": "%",
+      "source": "NASA POWER · RH2M (MERRA-2)"
+    },
+    "tmean": {
+      "label": "Mean air temperature",
+      "unit": "°C",
+      "source": "NASA POWER · T2M (MERRA-2)"
+    },
+    "tmin": {
+      "label": "Minimum air temperature at 2 m",
+      "unit": "°C",
+      "source": "NASA POWER · T2M_MIN (annual climatology field ANN, MERRA-2)"
+    },
+    "diurnal": {
+      "label": "Day–night temperature swing",
+      "unit": "°C",
+      "source": "NASA POWER · T2M_RANGE (MERRA-2)"
+    },
+    "seasonal": {
+      "label": "Seasonal temperature swing",
+      "unit": "°C",
+      "source": "NASA POWER · T2M monthly (MERRA-2)"
+    },
+    "albedo": {
+      "label": "Surface albedo",
+      "unit": "0–1",
+      "source": "NASA POWER · ALLSKY_SRF_ALB (CERES SYN1deg)"
+    },
+    "wind": {
+      "label": "Wind speed (10 m)",
+      "unit": "m/s",
+      "source": "NASA POWER · WS10M (MERRA-2)"
+    },
+    "frost": {
+      "label": "Frost days",
+      "unit": "days/yr",
+      "source": "NASA POWER · FROST_DAYS (MERRA-2)"
+    },
+    "elev": {
+      "label": "Elevation",
+      "unit": "m",
+      "source": "Derived from NASA POWER · PS (surface pressure)"
+    },
+    "ps": {
+      "label": "Surface pressure",
+      "unit": "kPa",
+      "source": "NASA POWER · PS"
+    }
+  },
+  "profiles": {
+    "jezero_meda": {
+      "name": "Mars · Jezero (MEDA)",
+      "examples": "Perseverance early observations in Jezero crater",
+      "summary": "A temperature-only pilot profile from calibrated NASA PDS measurements. It compares an early Jezero air-temperature cycle with Earth’s 2001–2025 climate. The rover observations and the landing marker describe different locations along the mission.",
+      "targets": {
+        "tmean": {
+          "value": -56.684,
+          "tolerance": 30,
+          "w": 1,
+          "why": "MEDA mean of 24 composite hourly air temperatures · tolerance 30 °C"
+        },
+        "diurnal": {
+          "value": 50.837,
+          "tolerance": 15,
+          "w": 1,
+          "why": "MEDA range of the 24 composite hourly means · tolerance 15 °C"
+        }
+      },
+      "observations": {
+        "airTemperatureC": -56.684,
+        "airTemperatureRangeC": 50.837,
+        "hourlyTemperatureC": [
+          -71.1891,
+          -72.1579,
+          -75.6539,
+          -77.569,
+          -79.105,
+          -80.908,
+          -78.5811,
+          -72.5859,
+          -61.2304,
+          -56.9399,
+          -45.4048,
+          -41.0418,
+          -36.1503,
+          -30.7142,
+          -30.3962,
+          -30.071,
+          -31.6502,
+          -34.3937,
+          -45.2608,
+          -55.3581,
+          -59.7893,
+          -62.0724,
+          -65.3149,
+          -66.8693
+        ],
+        "solsPerHour": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          3,
+          3,
+          4,
+          4,
+          4,
+          3
+        ],
+        "pressurePa": 757.11,
+        "pressureHours": 24,
+        "temperatureSols": [
+          40,
+          42,
+          43,
+          46
+        ],
+        "pressureSol": 46,
+        "method": "ATS_LOCAL_TEMP1 (mast). Filter missing/nonphysical readings (100–350 K). For each sampled sol, average samples in each local mean solar hour; average each hour equally across sols with observations. Mean and range are calculated across the 24 composite hourly means. Pressure uses nominal BAROCAP1 observations (300–1200 Pa) and averages available hourly means on sol 46.",
+        "products": [
+          {
+            "sol": 40,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0040/WE__0040___________CAL_ATS_________________P01.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0040/WE__0040___________CAL_ATS_________________P01.xml",
+            "records": 51684,
+            "sha256": "93b17f6a6fbeb3bbcffb316d3304e0b4f2d450add71f0eebf2caa0a60883538a"
+          },
+          {
+            "sol": 42,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0042/WE__0042___________CAL_ATS_________________P01.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0042/WE__0042___________CAL_ATS_________________P01.xml",
+            "records": 73318,
+            "sha256": "9f4661638dc48e4805c552fdb743f0187610853cfe5849813518bca537f54f79"
+          },
+          {
+            "sol": 43,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0043/WE__0043___________CAL_ATS_________________P01.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0043/WE__0043___________CAL_ATS_________________P01.xml",
+            "records": 77562,
+            "sha256": "cdb4d0848ec763203c963feb8d5dec46f983ca6ab147c8b70e4bead5f687a22a"
+          },
+          {
+            "sol": 46,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_ATS_________________P01.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_ATS_________________P01.xml",
+            "records": 105215,
+            "sha256": "829317f3ee75637499c81f2bacf488c7209dfc135b09d82b0bcaa16dbcf7a673"
+          },
+          {
+            "sol": 46,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_PS__________________P02.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_PS__________________P02.xml",
+            "records": 52406,
+            "sha256": "906c7e543e29a4cbaa824c7fd76f372e8d411b5778c764906199251e164b4d8e"
+          }
+        ],
+        "source": "https://pds.nasa.gov/ds-view/pds/viewBundle.jsp?identifier=urn%3Anasa%3Apds%3Amars2020_meda&version=1.0",
+        "terrain": "https://science.nasa.gov/mission/mars-2020-perseverance/location-map/",
+        "geology": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-makes-new-discoveries-in-mars-jezero-crater/",
+        "gravity": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+        "radiation": "https://science.nasa.gov/resource/medas-radiation-and-dust-sensor/",
+        "place": "Jezero",
+        "instrument": "MEDA",
+        "period": "Perseverance sols 40, 42, 43, 46 (April 2021)"
+      },
+      "earth_limits": [
+        "Mean surface gravity is about 3.73 m/s² on Mars and 9.82 m/s² on Earth (NASA Mars Fact Sheet).",
+        "Pressure, geology, slopes, and radiation are shown as mission context. This score uses the two temperature measures."
+      ]
+    },
+    "gale_rems": {
+      "name": "Mars · Gale (REMS)",
+      "examples": "",
+      "summary": "Air temperature from one documented Curiosity sol in Gale crater. The marker shows the landing site. Rover measurements were acquired along its route.",
+      "targets": {
+        "tmean": {
+          "value": -46.059,
+          "tolerance": 30,
+          "w": 1,
+          "why": "REMS air-temperature mean · scale 30 °C"
+        },
+        "diurnal": {
+          "value": 60.197,
+          "tolerance": 15,
+          "w": 1,
+          "why": "REMS air-temperature range · scale 15 °C"
+        }
+      },
+      "observations": {
+        "airTemperatureC": -46.059,
+        "airTemperatureRangeC": 60.197,
+        "hourlyTemperatureC": [
+          -65.1351,
+          -66.1649,
+          -66.7857,
+          -69.2783,
+          -69.8648,
+          -73.0492,
+          -64.9224,
+          -60.9109,
+          -49.8933,
+          -37.0736,
+          -31.1751,
+          -25.2522,
+          -12.8525,
+          -16.5108,
+          -15.6517,
+          -15.4297,
+          -20.7922,
+          -34.86,
+          -44.7232,
+          -43.087,
+          -52.7361,
+          -52.8458,
+          -56.7929,
+          -59.6384
+        ],
+        "samplesPerHour": [
+          2681,
+          374,
+          278,
+          294,
+          269,
+          278,
+          3021,
+          340,
+          189,
+          177,
+          205,
+          232,
+          163,
+          2533,
+          2986,
+          486,
+          300,
+          300,
+          2931,
+          354,
+          295,
+          293,
+          270,
+          282
+        ],
+        "products": [
+          {
+            "sol": 49,
+            "url": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/msl_rems_bundle/data_calibrated/SOL_00001_00089/SOL00049/RME_401796416RMD00490000000_______PA.TAB",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/msl_rems_bundle/data_calibrated/SOL_00001_00089/SOL00049/RME_401796416RMD00490000000_______PA.xml",
+            "records": 22200,
+            "sha256": "1ae603a3be60ea8042ed29de45a799b4122033635fbb4818c114a64e832c4aa6"
+          }
+        ],
+        "period": "Curiosity sol 49 (September 2012)",
+        "method": "REMS estimated ambient air temperature. Samples carry both operational-range and reliability flags. The 24 local solar hourly means are equally weighted. Daily swing is the range of those hourly means.",
+        "place": "Gale",
+        "instrument": "REMS",
+        "source": "https://pdsatmospheres.nmsu.edu/data_and_services/atmospheres_data/MARS/curiosity/rems.html"
+      },
+      "earth_limits": [
+        "Surface gravity averages 3.73 m/s² on Mars and 9.82 m/s² on Earth.",
+        "This score uses air-temperature statistics. Pressure, geology and radiation affect field-test suitability."
+      ]
+    },
+    "elysium_twins": {
+      "name": "Mars · Elysium Planitia (TWINS)",
+      "examples": "",
+      "summary": "Air temperature from seven valid NASA InSight weather summaries at the lander. The range uses reported daily extremes, which differ from hourly-mean ranges.",
+      "targets": {
+        "tmean": {
+          "value": -62.503,
+          "tolerance": 30,
+          "w": 1,
+          "why": "TWINS air-temperature mean · scale 30 °C"
+        },
+        "diurnal": {
+          "value": 84.006,
+          "tolerance": 15,
+          "w": 1,
+          "why": "TWINS air-temperature range · scale 15 °C"
+        }
+      },
+      "observations": {
+        "airTemperatureC": -62.503,
+        "airTemperatureRangeC": 84.006,
+        "period": "InSight sols 675–681 (October 2020)",
+        "method": "NASA InSight weather API. Average the seven valid daily air-temperature means. Daily swing is the average of the daily high minus low. The reported extrema are sampled extrema.",
+        "daily": [
+          {
+            "sol": 675,
+            "start": "2020-10-19T18:32:20Z",
+            "end": "2020-10-20T19:11:55Z",
+            "meanC": -62.314,
+            "minC": -96.872,
+            "maxC": -15.908,
+            "count": 177556
+          },
+          {
+            "sol": 676,
+            "start": "2020-10-20T19:11:55Z",
+            "end": "2020-10-21T19:51:31Z",
+            "meanC": -62.812,
+            "minC": -96.912,
+            "maxC": -16.499,
+            "count": 177554
+          },
+          {
+            "sol": 677,
+            "start": "2020-10-21T19:51:31Z",
+            "end": "2020-10-22T20:31:06Z",
+            "meanC": -63.056,
+            "minC": -97.249,
+            "maxC": -16.853,
+            "count": 177556
+          },
+          {
+            "sol": 678,
+            "start": "2020-10-22T20:31:06Z",
+            "end": "2020-10-23T21:10:41Z",
+            "meanC": -62.562,
+            "minC": -97.728,
+            "maxC": -9.055,
+            "count": 177556
+          },
+          {
+            "sol": 679,
+            "start": "2020-10-23T21:10:41Z",
+            "end": "2020-10-24T21:50:16Z",
+            "meanC": -62.551,
+            "minC": -96.644,
+            "maxC": -11.561,
+            "count": 177554
+          },
+          {
+            "sol": 680,
+            "start": "2020-10-24T21:50:16Z",
+            "end": "2020-10-25T22:29:51Z",
+            "meanC": -61.789,
+            "minC": -96.811,
+            "maxC": -15.298,
+            "count": 168902
+          },
+          {
+            "sol": 681,
+            "start": "2020-10-25T22:29:51Z",
+            "end": "2020-10-26T23:09:26Z",
+            "meanC": -62.434,
+            "minC": -95.447,
+            "maxC": -4.444,
+            "count": 88778
+          }
+        ],
+        "products": [
+          {
+            "url": "https://mars.nasa.gov/rss/api/?feed=weather&category=insight_temperature&feedtype=json&ver=1.0",
+            "sha256": "c5df364deee3545dc76e8e5c87e8edbe745cd68686ecf530a0d15dda5bdb4afd"
+          }
+        ],
+        "place": "Elysium Planitia",
+        "instrument": "TWINS",
+        "source": "https://mars.nasa.gov/layout/embed/image/insightweather/"
+      },
+      "earth_limits": [
+        "Surface gravity averages 3.73 m/s² on Mars and 9.82 m/s² on Earth.",
+        "This score uses air-temperature statistics. Pressure, geology and radiation affect field-test suitability."
+      ]
+    },
+    "jezero_combined": {
+      "name": "Mars · Jezero (combined)",
+      "examples": "Perseverance early observations in Jezero crater",
+      "summary": "Two Jezero temperature measurements from NASA PDS MEDA plus three screening proxies for dry, exposed terrain. The proxy targets are project choices. The albedo reference is a global Mars value.",
+      "targets": {
+        "tmean": {
+          "value": -56.684,
+          "tolerance": 30,
+          "w": 1,
+          "why": "MEDA mean of 24 composite hourly air temperatures · tolerance 30 °C"
+        },
+        "diurnal": {
+          "value": 50.837,
+          "tolerance": 15,
+          "w": 1,
+          "why": "MEDA range of the 24 composite hourly means · tolerance 15 °C"
+        },
+        "precip": {
+          "pct": 0,
+          "w": 1,
+          "why": "Dry-site proxy · lowest Earth precipitation percentile"
+        },
+        "soil": {
+          "pct": 0,
+          "w": 1,
+          "why": "Dry-site proxy · lowest Earth topsoil wetness percentile"
+        },
+        "albedo": {
+          "value": 0.25,
+          "w": 1,
+          "why": "Reflectivity proxy · global Mars albedo 0.25 (NASA Mars Fact Sheet), applied as a screening target"
+        }
+      },
+      "observations": {
+        "airTemperatureC": -56.684,
+        "airTemperatureRangeC": 50.837,
+        "hourlyTemperatureC": [
+          -71.1891,
+          -72.1579,
+          -75.6539,
+          -77.569,
+          -79.105,
+          -80.908,
+          -78.5811,
+          -72.5859,
+          -61.2304,
+          -56.9399,
+          -45.4048,
+          -41.0418,
+          -36.1503,
+          -30.7142,
+          -30.3962,
+          -30.071,
+          -31.6502,
+          -34.3937,
+          -45.2608,
+          -55.3581,
+          -59.7893,
+          -62.0724,
+          -65.3149,
+          -66.8693
+        ],
+        "solsPerHour": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          3,
+          3,
+          3,
+          3,
+          4,
+          4,
+          4,
+          3
+        ],
+        "pressurePa": 757.11,
+        "pressureHours": 24,
+        "temperatureSols": [
+          40,
+          42,
+          43,
+          46
+        ],
+        "pressureSol": 46,
+        "method": "ATS_LOCAL_TEMP1 (mast). Filter missing/nonphysical readings (100–350 K). For each sampled sol, average samples in each local mean solar hour; average each hour equally across sols with observations. Mean and range are calculated across the 24 composite hourly means. Pressure uses nominal BAROCAP1 observations (300–1200 Pa) and averages available hourly means on sol 46.",
+        "products": [
+          {
+            "sol": 40,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0040/WE__0040___________CAL_ATS_________________P01.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0040/WE__0040___________CAL_ATS_________________P01.xml",
+            "records": 51684,
+            "sha256": "93b17f6a6fbeb3bbcffb316d3304e0b4f2d450add71f0eebf2caa0a60883538a"
+          },
+          {
+            "sol": 42,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0042/WE__0042___________CAL_ATS_________________P01.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0042/WE__0042___________CAL_ATS_________________P01.xml",
+            "records": 73318,
+            "sha256": "9f4661638dc48e4805c552fdb743f0187610853cfe5849813518bca537f54f79"
+          },
+          {
+            "sol": 43,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0043/WE__0043___________CAL_ATS_________________P01.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0043/WE__0043___________CAL_ATS_________________P01.xml",
+            "records": 77562,
+            "sha256": "cdb4d0848ec763203c963feb8d5dec46f983ca6ab147c8b70e4bead5f687a22a"
+          },
+          {
+            "sol": 46,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_ATS_________________P01.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_ATS_________________P01.xml",
+            "records": 105215,
+            "sha256": "829317f3ee75637499c81f2bacf488c7209dfc135b09d82b0bcaa16dbcf7a673"
+          },
+          {
+            "sol": 46,
+            "csv": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_PS__________________P02.CSV",
+            "label": "https://pds-atmospheres.nmsu.edu/PDS/data/PDS4/Mars2020/mars2020_meda/data_calibrated_env/sol_0000_0089/sol_0046/WE__0046___________CAL_PS__________________P02.xml",
+            "records": 52406,
+            "sha256": "906c7e543e29a4cbaa824c7fd76f372e8d411b5778c764906199251e164b4d8e"
+          }
+        ],
+        "source": "https://pds.nasa.gov/ds-view/pds/viewBundle.jsp?identifier=urn%3Anasa%3Apds%3Amars2020_meda&version=1.0",
+        "terrain": "https://science.nasa.gov/mission/mars-2020-perseverance/location-map/",
+        "geology": "https://www.nasa.gov/missions/mars-2020-perseverance/perseverance-rover/nasas-perseverance-makes-new-discoveries-in-mars-jezero-crater/",
+        "gravity": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+        "radiation": "https://science.nasa.gov/resource/medas-radiation-and-dust-sensor/",
+        "place": "Jezero",
+        "instrument": "MEDA",
+        "period": "Perseverance sols 40, 42, 43, 46 (April 2021)"
+      },
+      "earth_limits": [
+        "Mean surface gravity is about 3.73 m/s² on Mars and 9.82 m/s² on Earth (NASA Mars Fact Sheet).",
+        "Pressure, geology, slopes, and radiation are shown as mission context. This score uses two temperature measures and three environmental proxies."
+      ],
+      "missingPolicy": "available"
+    },
+    "mars_equatorial": {
+      "name": "Mars · Equatorial landing sites",
+      "examples": "Jezero Crater (Perseverance), Gale Crater (Curiosity)",
+      "summary": "Hyper-arid, dusty, cold surface with very large day–night temperature swings and a mid-toned reddish surface (global Bond albedo ≈ 0.25).",
+      "targets": {
+        "precip": {
+          "pct": 0,
+          "w": 3,
+          "why": "No rain on Mars today"
+        },
+        "soil": {
+          "pct": 0,
+          "w": 3,
+          "why": "Desiccated regolith"
+        },
+        "rh": {
+          "pct": 0,
+          "w": 2,
+          "why": "Extremely dry atmosphere"
+        },
+        "diurnal": {
+          "pct": 1,
+          "w": 2,
+          "why": "Thin air → huge day–night swing"
+        },
+        "albedo": {
+          "value": 0.25,
+          "w": 1.5,
+          "why": "Mars global albedo ≈ 0.25"
+        },
+        "tmean": {
+          "pct": 0.15,
+          "w": 1,
+          "why": "Mean surface temperature ≈ −60 °C"
+        },
+        "frost": {
+          "pct": 0.7,
+          "w": 0.5,
+          "why": "Nightly frost is common"
+        },
+        "wind": {
+          "pct": 0.6,
+          "w": 0.5,
+          "why": "Wind-driven dust and dunes"
+        },
+        "elev": {
+          "pct": 0.85,
+          "w": 0.5,
+          "why": "Thin air, strong UV at altitude"
+        }
+      },
+      "earth_limits": [
+        "Gravity: Earth 1 g vs Mars 0.38 g",
+        "Air pressure: Mars has <1% of Earth's surface pressure",
+        "No global magnetic field or thick atmosphere on Mars → much higher surface radiation",
+        "Martian soil contains perchlorates; even the driest Earth deserts host microbes"
+      ]
+    },
+    "mars_periglacial": {
+      "name": "Mars · Mid-latitude ground ice",
+      "examples": "Arcadia Planitia, Utopia Planitia (candidate human landing regions with shallow ice)",
+      "summary": "Cold, dry plains with ice in the ground, strong seasons and repeated freezing — but bare ground, not snow cover.",
+      "targets": {
+        "tmean": {
+          "pct": 0.03,
+          "w": 2,
+          "why": "Permanently frozen ground"
+        },
+        "frost": {
+          "pct": 0.95,
+          "w": 2,
+          "why": "Freeze–thaw / frost almost all year"
+        },
+        "precip": {
+          "pct": 0.05,
+          "w": 2,
+          "why": "Polar-desert dryness"
+        },
+        "tmin": {
+          "pct": 0.02,
+          "w": 1,
+          "why": "Extreme winter cold"
+        },
+        "rh": {
+          "pct": 0.15,
+          "w": 1,
+          "why": "Dry air"
+        },
+        "soil": {
+          "pct": 0.3,
+          "w": 1,
+          "why": "Ice in the ground, little liquid water"
+        },
+        "albedo": {
+          "value": 0.3,
+          "w": 1,
+          "why": "Bare ground, not bright snow"
+        },
+        "seasonal": {
+          "pct": 0.95,
+          "w": 1,
+          "why": "Strong seasonal cycle"
+        },
+        "wind": {
+          "pct": 0.6,
+          "w": 0.5,
+          "why": "Wind-sculpted surfaces"
+        }
+      },
+      "earth_limits": [
+        "Liquid water is not stable on the Martian surface; ice sublimates instead of melting",
+        "Gravity: Earth 1 g vs Mars 0.38 g",
+        "Mars has <1% of Earth's air pressure and much higher radiation"
+      ]
+    },
+    "moon_south_pole": {
+      "name": "Moon · South-pole base region",
+      "examples": "Shackleton crater rim and other Artemis candidate regions",
+      "summary": "Extreme cold, no air or wind, rugged high-relief terrain, dark regolith (albedo ≈ 0.12), possible water ice in shadowed craters.",
+      "targets": {
+        "tmean": {
+          "pct": 0,
+          "w": 3,
+          "why": "Among the coldest places in the Solar System"
+        },
+        "tmin": {
+          "pct": 0,
+          "w": 2,
+          "why": "Shadowed craters below −200 °C"
+        },
+        "precip": {
+          "pct": 0,
+          "w": 2,
+          "why": "No atmosphere, no precipitation"
+        },
+        "wind": {
+          "pct": 0,
+          "w": 1.5,
+          "why": "No air → no wind"
+        },
+        "rh": {
+          "pct": 0,
+          "w": 1,
+          "why": "No atmosphere"
+        },
+        "albedo": {
+          "value": 0.12,
+          "w": 1,
+          "why": "Dark lunar regolith (≈ 0.12)"
+        },
+        "elev": {
+          "pct": 0.95,
+          "w": 1,
+          "why": "Rugged crater rims and massifs"
+        }
+      },
+      "earth_limits": [
+        "The Moon is a vacuum: no air, no weather, no sound",
+        "Gravity: Earth 1 g vs Moon 0.17 g",
+        "Permanently shadowed lunar craters are colder than anywhere on Earth",
+        "Sun stays near the horizon for months at the lunar poles"
+      ]
+    },
+    "moon_mare": {
+      "name": "Moon · Basaltic mare plains",
+      "examples": "Mare Tranquillitatis (Apollo 11), Oceanus Procellarum",
+      "summary": "Dark volcanic (basaltic) plains: very low albedo (≈ 0.07), bone-dry, no wind, enormous day–night temperature swings.",
+      "targets": {
+        "albedo": {
+          "value": 0.07,
+          "w": 3,
+          "why": "Mare basalt is very dark (≈ 0.07)"
+        },
+        "precip": {
+          "pct": 0,
+          "w": 2,
+          "why": "No water cycle"
+        },
+        "soil": {
+          "pct": 0,
+          "w": 2,
+          "why": "Completely dry regolith"
+        },
+        "diurnal": {
+          "pct": 1,
+          "w": 2,
+          "why": "Lunar day–night swing ≈ 250 °C"
+        },
+        "rh": {
+          "pct": 0.1,
+          "w": 1,
+          "why": "No atmosphere"
+        },
+        "wind": {
+          "pct": 0.1,
+          "w": 1,
+          "why": "No wind erosion"
+        }
+      },
+      "earth_limits": [
+        "Vacuum and 0.17 g on the Moon",
+        "Lunar regolith is made by micrometeorite impacts, not by wind and water",
+        "Earth basalts are chemically weathered by water and oxygen"
+      ]
+    }
+  },
+  "known_analogs": [
+    {
+      "name": "Atacama Desert, Chile",
+      "lat": -24.1,
+      "lon": -69.9,
+      "profiles": [
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "McMurdo Dry Valleys, Antarctica",
+      "lat": -77.5,
+      "lon": 161.8,
+      "profiles": [
+        "mars_periglacial",
+        "moon_south_pole"
+      ]
+    },
+    {
+      "name": "Haughton Crater, Devon Island, Canada",
+      "lat": 75.4,
+      "lon": -89.7,
+      "profiles": [
+        "mars_periglacial",
+        "moon_south_pole"
+      ]
+    },
+    {
+      "name": "Death Valley, USA",
+      "lat": 36.5,
+      "lon": -117.1,
+      "profiles": [
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "Mars Desert Research Station, Utah, USA",
+      "lat": 38.4,
+      "lon": -110.8,
+      "profiles": [
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "Mojave Desert, USA",
+      "lat": 35,
+      "lon": -115.5,
+      "profiles": [
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "Rio Tinto, Spain",
+      "lat": 37.7,
+      "lon": -6.6,
+      "profiles": [
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "Svalbard, Norway",
+      "lat": 79.4,
+      "lon": 13.3,
+      "profiles": [
+        "mars_periglacial"
+      ]
+    },
+    {
+      "name": "Icelandic Highlands",
+      "lat": 64.9,
+      "lon": -17,
+      "profiles": [
+        "moon_mare",
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "Mauna Kea, Hawaii, USA",
+      "lat": 19.8,
+      "lon": -155.5,
+      "profiles": [
+        "moon_mare"
+      ]
+    },
+    {
+      "name": "Lanzarote, Canary Islands, Spain",
+      "lat": 29,
+      "lon": -13.7,
+      "profiles": [
+        "moon_mare"
+      ]
+    },
+    {
+      "name": "Meteor Crater, Arizona, USA",
+      "lat": 35,
+      "lon": -111,
+      "profiles": [
+        "moon_mare"
+      ]
+    },
+    {
+      "name": "Ries Crater, Germany",
+      "lat": 48.9,
+      "lon": 10.6,
+      "profiles": []
+    },
+    {
+      "name": "Sudbury Basin, Canada",
+      "lat": 46.6,
+      "lon": -81.2,
+      "profiles": []
+    },
+    {
+      "name": "Pilbara, Australia",
+      "lat": -21.2,
+      "lon": 119,
+      "profiles": [
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "Namib Desert, Namibia",
+      "lat": -24,
+      "lon": 15.5,
+      "profiles": [
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "Ladakh, India",
+      "lat": 34.2,
+      "lon": 77.6,
+      "profiles": [
+        "mars_periglacial",
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "Qaidam Basin, Tibetan Plateau, China",
+      "lat": 37.5,
+      "lon": 93.5,
+      "profiles": [
+        "mars_equatorial"
+      ]
+    },
+    {
+      "name": "Arkaroola, Australia",
+      "lat": -30.3,
+      "lon": 139.3,
+      "profiles": [
+        "mars_equatorial"
+      ]
+    }
+  ],
+  "case_studies": [
+    {
+      "name": "Kryvyi Rih iron basin (Kryvbas), Ukraine",
+      "lat": 47.91,
+      "lon": 33.39,
+      "analog_of": "Mars · Meridiani Planum hematite",
+      "type": "Mineralogical analog",
+      "text": "Precambrian banded iron formation with hematite quartzites. Banded iron formations are proposed terrestrial analogs for the hematite deposits found by the Opportunity rover at Meridiani Planum — evidence of ancient water on Mars. Climate does NOT match (temperate, vegetated), which our tool shows honestly: this is a mineral/process analog, not an environmental one."
+    },
+    {
+      "name": "Boltysh impact crater, Ukraine",
+      "lat": 48.75,
+      "lon": 32.17,
+      "analog_of": "Moon & Mars · complex impact craters",
+      "type": "Process analog",
+      "text": "A buried ~24 km impact crater with a ~6 km central uplift, formed ~65 million years ago. Drill cores preserve the impact melt sheet and crater-lake sediments — useful for understanding how impacts shape and heat planetary crusts, and how crater lakes record past environments (as at Jezero Crater on Mars)."
+    },
+    {
+      "name": "Oleshky Sands, Ukraine (approx.)",
+      "lat": 46.55,
+      "lon": 32.95,
+      "analog_of": "Mars · aeolian dune fields",
+      "type": "Process analog",
+      "text": "One of Europe's largest inland sand massifs, shaped by wind. A test bed for studying dune migration with satellite imagery — the same remote-sensing approach used for Martian dunes. Today it can only be studied remotely, which is exactly how we study Mars."
+    }
+  ]
+}
