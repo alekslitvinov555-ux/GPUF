@@ -291,7 +291,16 @@
 <style>
 #globe .afx-marker{position:absolute;z-index:3;transform:translate(-50%,-50%);border:1px solid #d4edc5;border-radius:50%;background:#17382d;color:#fff;min-width:19px;min-height:19px;padding:0 3px;font:600 11px system-ui;cursor:pointer}
 #globe .afx-marker[data-kind="case"]{background:#775218}#globe .afx-marker[data-kind="selection"]{width:28px;height:28px;background:none;border:2px solid white;pointer-events:none}
-#pc a.afx-terrain{display:inline-block;background:#214842;color:#efffed;border:1px solid #5ea79a;border-radius:6px;padding:7px 11px;text-decoration:none}
+#pc .afx-terrain{background:#214842;color:#efffed;border:1px solid #5ea79a;border-radius:6px;padding:8px 12px;font:inherit;cursor:pointer}
+#terrain-lab{padding:0;border:1px solid #7e9d90;border-radius:18px;background:#142923;color:#eef7ee;width:min(1450px,96vw);height:94dvh;max-width:none;max-height:none;overflow:hidden}
+#terrain-lab[open]{display:grid;grid-template-rows:auto minmax(0,1fr);animation:terrain-lab-in .22s ease-out}
+#terrain-lab::backdrop{background:rgba(4,15,18,.78)}
+#terrain-lab > header{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:8px 16px;border-bottom:1px solid #49645b;font:600 13px system-ui}
+#terrain-lab button{padding:7px 12px;background:#d9e9dd;color:#17382f;border:0;border-radius:6px;font:inherit;cursor:pointer}
+#terrain-lab-view{width:100%;height:100%;border:0;background:#eaf1e9}
+@keyframes terrain-lab-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:700px){#terrain-lab{width:100vw;height:100dvh;border:0;border-radius:0}}
+@media(prefers-reduced-motion:reduce){#terrain-lab[open]{animation:none}}
 </style>
 </head>
 <body class="view-map">
@@ -1129,8 +1138,8 @@
   function terrainLink(lat, lon) {
     if (Math.abs(lat) > 84) return '<p>3D elevation coverage ends at 84° latitude.</p>';
     const origin = location.protocol === 'file:' ? 'http://127.0.0.1:8077' : location.origin;
-    const query = new URLSearchParams({ lat: lat.toFixed(4), lon: lon.toFixed(4) });
-    return `<p><a class="afx-terrain" target="_blank" rel="noopener" href="${origin}/terrain.html?${query}">God’s Eye · Explore in 3D ↗</a></p>`;
+    const query = new URLSearchParams({ lat: lat.toFixed(4), lon: lon.toFixed(4), embedded: "1" });
+    return `<p><button class="afx-terrain" type="button" data-terrain-url="${origin}/terrain.html?${query}" aria-haspopup="dialog">Open Terrain Lab</button></p>`;
   }
   let cardSeq = 0;
   async function openCard(lat, lon, extra = {}) {
@@ -1546,6 +1555,46 @@ if (AFX && canvas) {
     renderer.render(scene, camera);
   });
 }
+</script>
+<dialog id="terrain-lab" aria-labelledby="terrain-lab-title">
+  <header>
+    <span id="terrain-lab-title">Terrain Lab</span>
+    <button id="terrain-lab-back" type="button">Back to atlas</button>
+  </header>
+  <iframe id="terrain-lab-view" title="Interactive 3D terrain"></iframe>
+</dialog>
+<script id="terrain-lab-controller">
+(() => {
+  const dialog = document.getElementById("terrain-lab");
+  const frame = document.getElementById("terrain-lab-view");
+  const back = document.getElementById("terrain-lab-back");
+  let trigger;
+  let viewerOrigin;
+  document.getElementById("pc-bd").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-terrain-url]");
+    if (!button || dialog.open) return;
+    const viewer = new URL(button.dataset.terrainUrl);
+    viewer.searchParams.set("parentOrigin", location.origin);
+    trigger = button;
+    viewerOrigin = viewer.origin;
+    frame.src = viewer.href;
+    dialog.showModal();
+    back.focus();
+  });
+  back.addEventListener("click", () => dialog.close());
+  window.addEventListener("message", (event) => {
+    if (dialog.open && event.source === frame.contentWindow &&
+        event.origin === viewerOrigin && event.data === "atlas:close-terrain") {
+      dialog.close();
+    }
+  });
+  dialog.addEventListener("close", () => {
+    frame.removeAttribute("src");
+    viewerOrigin = undefined;
+    trigger?.focus();
+    trigger = undefined;
+  });
+})();
 </script>
 </body>
 </html>

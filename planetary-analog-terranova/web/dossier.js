@@ -106,12 +106,12 @@ export function dossierHtml({ context, terrain, route, readiness, shots, sources
 
   // 2. Snapshots
   const figs = shots ? `<div class="figs">
-      <figure><img src="${shots.oblique}" alt="3D view of the terrain block around ${esc(site.label)}"><figcaption>3D view as shown in God's Eye${shots.exaggeration !== 1 ? `, heights exaggerated ${shots.exaggeration}×` : ", true vertical scale"}. White outline: the scored 0.5° cell.</figcaption></figure>
+      <figure><img src="${shots.oblique}" alt="3D view of the terrain block around ${esc(site.label)}"><figcaption>3D view as shown in Terrain Lab${shots.exaggeration !== 1 ? `, heights exaggerated ${shots.exaggeration}×` : ", true vertical scale"}. White outline: the scored 0.5° cell.</figcaption></figure>
       <figure><img src="${shots.top}" alt="Top-down map of the block with the planned route"><figcaption>Top-down, north up, ${Math.round(terrain.ground_size_m / 1000)} km across. Route in blue, stretches over ${route?.limit_deg ?? 15}° in red.</figcaption></figure>
     </div>` : "";
 
   // 3. Traverse
-  let traverseSection = `<p class="note">No traverse was planned for this dossier. Use “Plan a traverse” in God's Eye to add one.</p>`;
+  let traverseSection = `<p class="note">No traverse was planned for this dossier. Use “Plan a traverse” in Terrain Lab to add one.</p>`;
   if (route) {
     const chart = profileChart(route, { width: 640, height: 170, inline: true }).svg;
     const totals = totalsList(route).map(([k, v]) => `<div><span>${esc(k)}</span><b>${esc(v)}</b></div>`).join("");

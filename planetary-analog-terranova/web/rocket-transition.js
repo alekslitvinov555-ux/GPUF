@@ -163,7 +163,7 @@
     clearTimeout(bootTimer);
     const root = document.getElementById('godseye');
     root.dataset.arrival = 'error';
-    document.getElementById('geArrivalStatus').textContent = 'God’s Eye could not open. Retry, or return to Finder to choose a site.';
+    document.getElementById('geArrivalStatus').textContent = 'Terrain Lab could not open. Retry, or return to Finder to choose a site.';
     document.getElementById('geArrivalDetail').textContent = message;
     document.getElementById('geArrivalError').hidden = false;
     document.getElementById('geArrivalRetry').hidden = false;

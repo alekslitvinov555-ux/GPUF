@@ -1,0 +1,166 @@
+/* Terrain Lab uses a dedicated control rail beside the live viewport. */
+.godseye.terrain-lab {
+  --lab-width: clamp(min(280px, 70vw), var(--lab-saved-width, 31vw), 70vw);
+  --lab-sheet: 0px;
+  --ink: #182e25;
+  --ink-2: #354f43;
+  --ink-3: #4d6358;
+  --line: #ccd8ca;
+  --line-2: #aebfaf;
+  --surface: #f4f7ef;
+  --surface-2: #e6eee1;
+  --surface-3: #d7e5d5;
+  --overlay: #f4f7ef;
+  --accent: #236048;
+  color-scheme: light;
+  color: var(--ink);
+  background: #21332f;
+  font-family: system-ui, sans-serif;
+  grid-template: auto minmax(0, 1fr) / var(--lab-width) minmax(0, 1fr);
+}
+
+.terrain-lab:not([hidden]) { display: grid; }
+
+.terrain-lab #geCanvas {
+  position: static;
+  grid-area: 2 / 2;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.terrain-lab .ge-top {
+  position: relative;
+  inset: auto;
+  z-index: 7;
+  grid-area: 1 / 1 / 2 / -1;
+  padding: 12px clamp(12px, 2vw, 26px);
+  align-items: center;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-2);
+  pointer-events: auto;
+}
+
+.godseye.terrain-lab.lunar-sky .ge-top { background: var(--surface); }
+.terrain-lab .terrain-lab-name {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.terrain-lab .ge-top h2 {
+  margin: 3px 0;
+  max-width: none;
+  font: 650 clamp(16px, 2vw, 28px)/1.1 system-ui, sans-serif;
+  letter-spacing: -.035em;
+  overflow-wrap: anywhere;
+}
+.terrain-lab .ge-top .breadcrumbs { margin: 0 0 5px; }
+.terrain-lab .ge-top .breadcrumbs:empty,
+.terrain-lab .ge-badges:empty,
+.lab-embedded .terrain-lab .ge-top .breadcrumbs,
+.lab-embedded .terrain-lab #geClose { display: none; }
+.terrain-lab .ge-top-actions { flex: 0 0 auto; align-items: center; max-width: none; }
+.terrain-lab .ge-top-actions :is(button.ghost, .icon-button) {
+  background: var(--surface-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  backdrop-filter: none;
+}
+
+.godseye.terrain-lab .ge-console {
+  position: relative;
+  inset: auto;
+  z-index: 5;
+  grid-area: 2 / 1;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  max-height: none;
+  padding: 0 0 12px;
+  border: 0;
+  border-right: 1px solid var(--line-2);
+  border-radius: 0;
+  backdrop-filter: none;
+  background: var(--surface);
+  animation: none;
+  overflow: auto;
+}
+
+.terrain-lab .ge-tabs {
+  position: sticky;
+  flex-shrink: 0;
+  padding: 10px 29px 10px 9px;
+  gap: 2px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+}
+.terrain-lab .ge-tab { flex-shrink: 0; padding-inline: 16px; }
+.terrain-lab .ge-tabs button { color: var(--ink-2); border-radius: 5px; }
+.terrain-lab .ge-tabs button[aria-selected="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.terrain-lab .ge-console .ge-stat { border-radius: 6px; }
+.terrain-lab .ge-console .ge-stat b { font-variant-numeric: tabular-nums; }
+.terrain-lab .ge-console .ge-resize { left: auto; right: 0; touch-action: none; }
+.terrain-lab .ge-console .ge-resize::after { background: var(--line-2); }
+.terrain-lab .ge-console .ge-resize:hover::after,
+.terrain-lab .ge-console.is-resizing .ge-resize::after { background: var(--accent); }
+
+.godseye.terrain-lab .ge-console.is-collapsed {
+  align-self: start;
+  border-bottom: 1px solid var(--line-2);
+}
+.terrain-lab:has(.ge-console.is-collapsed) #geCanvas,
+.terrain-lab[data-status="error"] #geCanvas { grid-column: 1 / -1; }
+.terrain-lab .ge-console.is-collapsed [data-getab],
+.terrain-lab .ge-console.is-collapsed .ge-hint { color: var(--ink-2); }
+
+.terrain-lab .ge-hud {
+  left: calc(var(--lab-width) + 16px);
+  bottom: calc(var(--lab-sheet) + 62px);
+  pointer-events: none;
+}
+.terrain-lab .ge-credit {
+  left: var(--lab-width);
+  bottom: var(--lab-sheet);
+  margin: 0;
+  padding: 8px 12px;
+  color: #f0f8ee;
+  background: #182e25e8;
+  font-size: 11px;
+}
+.terrain-lab .ge-credit a { color: inherit; text-decoration: underline; }
+.terrain-lab:has(.ge-console.is-collapsed) :is(.ge-hud, .ge-credit),
+.terrain-lab[data-status="error"] .ge-credit { --lab-width: 0px; }
+
+.lab-embedded > main { padding: 16px; }
+.lab-embedded > main > a { display: none; }
+
+@media (max-width: 700px) {
+  .godseye.terrain-lab {
+    --lab-width: 0px;
+    --lab-sheet: min(42%, 360px);
+    grid-template: auto minmax(0, 1fr) var(--lab-sheet) / minmax(0, 1fr);
+  }
+  .godseye.terrain-lab:has(.ge-console.is-collapsed) { --lab-sheet: 88px; }
+  .godseye.terrain-lab[data-status="error"] { --lab-sheet: 0px; }
+  .terrain-lab #geCanvas { grid-area: 2 / 1; }
+  .godseye.terrain-lab .ge-console {
+    grid-area: 3 / 1;
+    align-self: stretch;
+    border: 0;
+    border-top: 1px solid var(--line-2);
+  }
+  .godseye.terrain-lab .ge-console.is-collapsed { align-self: stretch; }
+  .terrain-lab .ge-console .ge-resize { display: none; }
+  .terrain-lab .ge-top { padding: 8px 12px; }
+  .terrain-lab .ge-top-actions { gap: 4px; }
+  .terrain-lab .ge-credit { padding: 6px 8px; }
+  .terrain-lab .ge-hud { bottom: calc(var(--lab-sheet) + 50px); }
+}

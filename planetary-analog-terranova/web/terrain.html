@@ -2,16 +2,17 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>God’s Eye · Planetary Analog Atlas</title>
+<title>Terrain Lab · Planetary Analog Atlas</title>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="shared-controls.css">
 <link rel="stylesheet" href="godseye-console.css">
+<link rel="stylesheet" href="terrain-lab.css">
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js"}}</script>
 <body>
 <main><p id="terrain-error" role="status">Loading terrain…</p><a href="/original/#globe">Back to the original atlas</a></main>
-<section class="godseye" id="godseye" hidden role="dialog" aria-modal="true" aria-labelledby="geTitle">
+<section class="godseye terrain-lab" id="godseye" hidden role="dialog" aria-modal="true" aria-labelledby="geTitle">
   <div id="geArrival" hidden>
-    <header class="ge-arrival-header"><h2 id="geArrivalTitle">God’s Eye</h2><a class="btn btn-ghost" id="geArrivalBack" href="/original/#globe">Back to atlas</a></header>
+    <header class="ge-arrival-header"><h2 id="geArrivalTitle">Terrain Lab</h2><a class="btn btn-ghost" id="geArrivalBack" href="/original/#globe">Back to atlas</a></header>
     <div class="ge-arrival-content">
       <div class="spinner" aria-hidden="true"></div>
       <p id="geArrivalStatus" role="status">Finding your terrain from the ranked sites…</p>
@@ -23,6 +24,7 @@
   <header class="ge-top">
     <div>
       <nav class="breadcrumbs" id="terrainBreadcrumbs" aria-label="Breadcrumb"></nav>
+      <div class="terrain-lab-name">Terrain Lab</div>
       <h2 id="geTitle"></h2>
       <p class="ge-sub" id="geSub"></p>
       <div class="ge-badges" id="geBadges"></div>
@@ -34,10 +36,10 @@
     </div>
   </header>
   <aside class="ge-panel ge-console" aria-label="Terrain, view, planning and climate">
-    <div class="ge-tabs" role="tablist" aria-label="God's Eye panels">
+    <div class="ge-tabs" role="tablist" aria-label="Terrain Lab panels">
       <button role="tab" type="button" data-getab="overview" aria-selected="true"><svg class="i" aria-hidden="true"><use href="icons.svg#i-mountains"></use></svg><span>Overview</span></button>
-      <button role="tab" type="button" data-getab="view" aria-selected="false"><svg class="i" aria-hidden="true"><use href="icons.svg#i-stack"></use></svg><span>View</span></button>
-      <button role="tab" type="button" data-getab="plan" aria-selected="false"><svg class="i" aria-hidden="true"><use href="icons.svg#i-path"></use></svg><span>Plan</span></button>
+      <button role="tab" type="button" data-getab="view" aria-selected="false"><svg class="i" aria-hidden="true"><use href="icons.svg#i-stack"></use></svg><span>Surface</span></button>
+      <button role="tab" type="button" data-getab="plan" aria-selected="false"><svg class="i" aria-hidden="true"><use href="icons.svg#i-path"></use></svg><span>Route</span></button>
       <button role="tab" type="button" data-getab="climate" aria-selected="false"><svg class="i" aria-hidden="true"><use href="icons.svg#i-thermometer"></use></svg><span>Climate</span></button>
     </div>
     <div class="ge-tab" data-getab-panel="overview" role="tabpanel">

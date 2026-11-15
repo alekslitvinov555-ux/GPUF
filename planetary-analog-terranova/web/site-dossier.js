@@ -95,7 +95,7 @@ export function dossierHtml(r, ctx) {
       <h4>What happens here <small>Earth processes · not scored</small></h4><p class="hint">Loading…</p></section>
 
     <div class="sd-actions">
-      <button class="godseye-button" type="button" id="openEye" ${Math.abs(r.lat) > 84 ? "disabled title=\"Elevation tiles stop at about 84 degrees latitude\"" : ""}>${icon("cube-focus")}Explore in 3D</button>
+      <button class="godseye-button" type="button" id="openEye" ${Math.abs(r.lat) > 84 ? "disabled title=\"Elevation tiles stop at about 84 degrees latitude\"" : ""}>${icon("cube-focus")}Open Terrain Lab</button>
       <button class="ghost small" type="button" id="pinSite">${icon("push-pin")}${pinned ? "Unpin" : "Compare"}</button>
       <button class="ghost small" type="button" data-copy="${r.lat.toFixed(3)}, ${r.lon.toFixed(3)}">${icon("copy")}Copy location</button>
     </div>

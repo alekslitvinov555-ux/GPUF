@@ -436,7 +436,7 @@ function renderMarkers() {
   if (focusKey) labels.querySelector(`[data-key="${CSS.escape(focusKey)}"]`)?.focus({ preventScroll: true });
 }
 
-/* A small card pinned to the clicked place: the essentials, and a way into God's Eye. */
+/* A small card pinned to the clicked place: the essentials, and a way into Terrain Lab. */
 function infoCard(r) {
   const el = document.createElement("div");
   el.className = "info-card";
@@ -457,7 +457,7 @@ function infoCard(r) {
     </div>
     <div class="ic-actions">
       <button class="godseye-button small" type="button" data-act="eye" ${polar ? "disabled title=\"Elevation tiles stop at about 84 degrees latitude\"" : ""}>
-        ${icon("cube-focus")}God's Eye 3D</button>
+        ${icon("cube-focus")}Open Terrain Lab</button>
       <button class="ghost small" type="button" data-act="more">Details</button>
     </div>`;
   el.querySelector(".ic-close").addEventListener("click", closeCard);
@@ -1312,7 +1312,7 @@ function viewsStrip(r) {
       <figcaption>Latest NASA view · VIIRS NOAA-20 · ${day}<br><small>daily, 250 m, may show clouds · needs internet</small></figcaption></figure>
     <figure><img src="${esc(relief)}" alt="Relief-shaded Sentinel-2 image" loading="lazy"
       onerror="this.closest('figure').classList.add('missing')">
-      <figcaption>Terrain relief · Sentinel-2 2020<br><small>3D terrain available in God's Eye</small></figcaption></figure>
+      <figcaption>Terrain relief · Sentinel-2 2020<br><small>3D terrain available in Terrain Lab</small></figcaption></figure>
   </div>`;
 }
 
@@ -1460,7 +1460,7 @@ async function renderExplore() {
   $("exY").addEventListener("change", (e) => { box.dataset.y = e.target.value; renderExplore(); });
 }
 
-/* --------------------------------------------------------------- God's Eye */
+/* --------------------------------------------------------------- Terrain Lab */
 
 let eye = { open: false };
 let eyeReturnFocus = null;
@@ -1493,7 +1493,7 @@ function dossierContext(r, t) {
 function openGodsEye(r, preset = null, { arrival = false } = {}) {
   if (!r) {
     if (arrival) throw new Error('No site is selected. Return to Finder and choose one.');
-    toast("Select a site first, then open God's Eye.", "info"); return Promise.resolve();
+    toast("Select a site first, then open Terrain Lab.", "info"); return Promise.resolve();
   }
   if (Math.abs(r.lat) > 84) {
     if (arrival) throw new Error('The selected site is outside terrain coverage. Return to Finder to choose another site.');
@@ -1505,8 +1505,8 @@ function openGodsEye(r, preset = null, { arrival = false } = {}) {
       eye = new GodsEye($("godseye"));
       eye.onClose = restoreMap;
     } catch {
-      if (arrival) throw new Error('God’s Eye could not start WebGL. Enable browser hardware acceleration and retry.');
-      toast("God’s Eye could not start WebGL. Try a browser with hardware acceleration enabled.", "error");
+      if (arrival) throw new Error('Terrain Lab could not start WebGL. Enable browser hardware acceleration and retry.');
+      toast("Terrain Lab could not start WebGL. Try a browser with hardware acceleration enabled.", "error");
       return Promise.resolve();
     }
   }
@@ -1723,7 +1723,7 @@ const TOUR = [
     run: async () => { const r = tourSite(); if (r && state.selected !== r) selectResult(r); },
   },
   {
-    title: "God's Eye",
+    title: "Terrain Lab",
     text: "Descend into the Karakoram's real terrain in 3D, a high, cold, rugged stand-in for the lunar south pole. Watch: a day passes, the heights are exaggerated, and a rover drives a route.",
     run: async (alive) => {
       const r = tourSite();
@@ -1749,7 +1749,7 @@ const TOUR = [
   },
 ];
 
-/* The God's Eye tour step plays itself: each control glows as the tour uses it. */
+/* The Terrain Lab tour step plays itself: each control glows as the tour uses it. */
 function tourGlow(el) {
   document.querySelectorAll(".tour-glow").forEach((e) => e.classList.remove("tour-glow"));
   el?.classList.add("tour-glow");
@@ -1866,7 +1866,7 @@ function wireKeys() {
       if (closeMenus()) { e.preventDefault(); return; }
       if (eye.open) {
         eye.escape();
-        if (!eye.open && tourIndex >= 0) tourStop();   // leaving God's Eye ends the tour step showing it
+        if (!eye.open && tourIndex >= 0) tourStop();   // leaving Terrain Lab ends the tour step showing it
         e.preventDefault();
         return;
       }
@@ -1945,7 +1945,7 @@ function renderMethod() {
     <h3>Validate</h3>
     <p>Known analog sites (Haughton Crater, McMurdo Dry Valleys, Atacama, Apollo training sites and others, each cited) should
       outscore densely vegetated reference points. The Validation tab reports ROC-AUC for the current target and weights.</p>
-    <h3>Look closer in God's Eye</h3>
+    <h3>Look closer in Terrain Lab</h3>
     <p>Open any site in 3D. Its terrain comes from AWS Terrain Tiles at about 150 m, draped with Sentinel-2 cloud-free
       imagery (ESA Copernicus data processed by EOX). The panel measures relief and slope inside the scored cell at that
       finer scale, including the share of ground a rover could drive (slopes under 15°). You can light it with a lunar polar sun.</p>
@@ -1956,7 +1956,7 @@ function renderMethod() {
       "ready for TRL 5-6 field tests", NASA's level for testing in a relevant environment. These are screening thresholds, not
       NASA certification.</p>
     <h3>Plan an EVA traverse</h3>
-    <p>In God's Eye, “Plan a traverse” lets you click up to 8 waypoints (Basecamp, Science Station, Drill Site…). The server
+    <p>In Terrain Lab, “Plan a traverse” lets you click up to 8 waypoints (Basecamp, Science Station, Drill Site…). The server
       measures the route on the full-resolution elevation tiles: elevation, grade, climb and descent, the stretches steeper than
       the 15° rover limit, and a walking time from Tobler's hiking function (an Earth estimate on foot). “Export mission dossier”
       saves one printable file with the pictures, route, readiness, criteria and every citation; the route also exports as GeoJSON.</p>
@@ -1967,7 +1967,7 @@ function renderMethod() {
       <li>Cells are 0.5° (~55 km). A small feature (a summit, a crater floor) is averaged with its surroundings; Mauna Kea's cell includes its forested slopes.</li>
       <li>Where MODIS has no land-surface-temperature data (mainly Antarctica) the day-night swing is predicted from NASA POWER skin temperature${fit ? ` (linear fit, r = ${fit.r})` : ""}.</li>
       <li>NASA POWER precipitation is a reanalysis (MERRA-2) and can overestimate polar deserts.</li>
-      <li>The elevation tiles stop near ±85° latitude, so the far polar interiors are not scored, and God's Eye opens sites up to 84°.</li>
+      <li>The elevation tiles stop near ±85° latitude, so the far polar interiors are not scored, and Terrain Lab opens sites up to 84°.</li>
       <li>This is a screening tool for choosing where to look, not a site survey.</li>
     </ul>`;
 }
@@ -1987,13 +1987,13 @@ function renderSources() {
     ${targets}
     <h3>Known analog catalog</h3><p>${esc(s.analogs.provenance)} ${s.analogs.sites} sites.</p>
     <h3>Imagery</h3><ul>${maps}
-      <li>God's Eye terrain: AWS Terrain Tiles (Terrarium): SRTM, GMTED, ETOPO1 and others</li>
-      <li>God's Eye imagery: EOxCloudless https://cloudless.eox.at by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2020), CC BY-NC-SA 4.0</li>
+      <li>Terrain Lab terrain: AWS Terrain Tiles (Terrarium): SRTM, GMTED, ETOPO1 and others</li>
+      <li>Terrain Lab imagery: EOxCloudless https://cloudless.eox.at by EOX IT Services GmbH (Contains modified Copernicus Sentinel data 2020), CC BY-NC-SA 4.0</li>
       <li>Detail tiles and hover previews: NASA Blue Marble via NASA GIBS</li></ul>
     <h3>Readiness and traverse</h3><ul>
       <li>Readiness levels: <a href="https://www.nasa.gov/directorates/somd/space-communications-navigation-program/technology-readiness-levels/" target="_blank" rel="noopener">NASA, Technology Readiness Levels</a>; each threshold links to its own source in the matrix.</li>
       <li>Walking time: <a href="https://en.wikipedia.org/wiki/Tobler%27s_hiking_function" target="_blank" rel="noopener">Tobler's hiking function</a> (Tobler 1993).</li>
-      <li>Route terrain: AWS Terrain Tiles (Terrarium), the same elevation as God's Eye.</li></ul>
+      <li>Route terrain: AWS Terrain Tiles (Terrarium), the same elevation as Terrain Lab.</li></ul>
     <h3>Software</h3><p>three.js (MIT), FastAPI, NumPy, SciPy, rasterio, zarr. Place names: Natural Earth (public domain).</p>`;
 }
 

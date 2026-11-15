@@ -1,4 +1,4 @@
-// God's Eye side panel as a 4-tab console. Pure layout: every control keeps its id and
+// Terrain Lab side panel as a 4-tab console. Pure layout: every control keeps its id and
 // its behaviour in godseye.js. Results that appear (probe, route, profile) bring their
 // tab forward, so nothing important lands on a hidden tab.
 (() => {
@@ -19,18 +19,32 @@
     else for (const t of tabs) t.setAttribute("aria-selected", String(t.dataset.getab === current));
   };
   close.addEventListener("click", () => setCollapsed(true));
-  // Drag the left edge to make the panel wider or narrower (remembered per browser).
+  // Resize the tool rail from the edge facing the terrain.
   const grip = document.createElement("div");
-  grip.className = "ge-resize"; grip.title = "Drag to resize"; grip.setAttribute("aria-hidden", "true");
+  grip.className = "ge-resize";
+  grip.title = "Drag to resize";
+  grip.setAttribute("aria-hidden", "true");
   panel.appendChild(grip);
-  try { const w0 = +localStorage.getItem("ge-width"); if (w0) panel.style.width = `${w0}px`; } catch { /* storage off */ }
-  grip.addEventListener("pointerdown", (e) => {
-    e.preventDefault(); grip.setPointerCapture(e.pointerId); panel.classList.add("is-resizing");
-    const right = panel.getBoundingClientRect().right;
-    const move = (ev) => { panel.style.width = `${Math.max(280, Math.min(innerWidth * 0.7, right - ev.clientX))}px`; };
-    const up = () => { panel.classList.remove("is-resizing"); grip.removeEventListener("pointermove", move); grip.removeEventListener("pointerup", up);
-      try { localStorage.setItem("ge-width", parseInt(panel.style.width, 10)); } catch { /* storage off */ } };
-    grip.addEventListener("pointermove", move); grip.addEventListener("pointerup", up);
+  const lab = panel.closest(".terrain-lab");
+  const setWidth = (width) => lab.style.setProperty("--lab-saved-width", `${width}px`);
+  try {
+    const saved = Number(localStorage.getItem("ge-width"));
+    if (saved > 0) setWidth(saved);
+  } catch { /* storage off */ }
+  grip.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    grip.setPointerCapture(event.pointerId);
+    panel.classList.add("is-resizing");
+    const left = panel.getBoundingClientRect().left;
+    const move = (pointer) => setWidth(pointer.clientX - left);
+    const finish = () => {
+      panel.classList.remove("is-resizing");
+      grip.removeEventListener("pointermove", move);
+      grip.removeEventListener("lostpointercapture", finish);
+      try { localStorage.setItem("ge-width", Math.round(panel.getBoundingClientRect().width)); } catch { /* storage off */ }
+    };
+    grip.addEventListener("pointermove", move);
+    grip.addEventListener("lostpointercapture", finish);
   });
 
   const show = (name) => {
@@ -67,7 +81,7 @@
     new MutationObserver(tidy).observe(sub, { childList: true, characterData: true, subtree: true });
     tidy();
   }
-  // Each time God's Eye opens, start on the overview.
+  // Each time Terrain Lab opens, start on the overview.
   const root = document.getElementById("godseye");
   if (root) new MutationObserver(() => { if (!root.hidden) { show("overview"); setCollapsed(true); } }).observe(root, { attributes: true, attributeFilter: ["hidden"] });
 })();

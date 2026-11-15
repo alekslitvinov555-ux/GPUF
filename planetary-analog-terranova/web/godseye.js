@@ -1,4 +1,4 @@
-/* God's Eye: fly down into one site and see its real terrain in 3D.
+/* Terrain Lab: fly down into one site and see its real terrain in 3D.
  *
  * Elevation and local terrain statistics come from /api/site3d (AWS Terrain
  * Tiles, ~150 m). Imagery is Sentinel-2 cloudless (ESA Copernicus data via EOX)
@@ -209,7 +209,7 @@ export class GodsEye {
     this.traverseMode = false;
     this.sunPlaying = false;
 
-    new ResizeObserver(() => this._resize()).observe(root);
+    new ResizeObserver(() => this._resize()).observe(this.canvas);
     this._bindUi();
     this.climate = new ClimateSim(this);
     $("geThermalRamp").style.background = thermalGradient();
@@ -407,7 +407,7 @@ export class GodsEye {
       const link = item.querySelector("a");
       return link ? { label: link.textContent, href: link.getAttribute("href") } : { label: item.textContent, href: location.href, action: "finder" };
     });
-    breadcrumbs($("terrainBreadcrumbs"), [...trail, { label: `God’s Eye · ${site.label?.text || "Selected site"}` }]);
+    breadcrumbs($("terrainBreadcrumbs"), [...trail, { label: `Terrain Lab · ${site.label?.text || "Selected site"}` }]);
     $("terrainBreadcrumbs").querySelector('[data-crumb-action="finder"]')?.addEventListener("click", event => { event.preventDefault(); this.close(); });
     $("geSub").textContent = context.subtitle || "";
     $("geBadges").innerHTML = context.badges || "";
@@ -1274,8 +1274,8 @@ export class GodsEye {
   }
 
   _resize() {
-    const w = this.root.clientWidth;
-    const h = this.root.clientHeight;
+    const w = this.canvas.clientWidth;
+    const h = this.canvas.clientHeight;
     if (!w || !h) return;
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
@@ -1318,8 +1318,8 @@ export class GodsEye {
     const p1 = p0.clone().add(right);   // 1 km across the screen at the focus
     const a = p0.clone().project(this.camera);
     const b = p1.clone().project(this.camera);
-    const w = this.root.clientWidth;
-    const pxPerKm = Math.hypot((b.x - a.x) * w / 2, (b.y - a.y) * this.root.clientHeight / 2);
+    const w = this.canvas.clientWidth;
+    const pxPerKm = Math.hypot((b.x - a.x) * w / 2, (b.y - a.y) * this.canvas.clientHeight / 2);
     if (!Number.isFinite(pxPerKm) || pxPerKm <= 0) return;
     const km = niceLength(140 / pxPerKm);
     $("geScaleBar").style.width = `${Math.round(km * pxPerKm)}px`;
