@@ -8,7 +8,7 @@ Use **Workers & Pages → Create → Import a Git repository**. Connect this rep
 
 | Field | Value |
 |---|---|
-| Worker name | `planetary-analog-atlas` |
+| Worker name | `gpuf` |
 | Production branch | `main` |
 | Root directory | `planetary-analog-terranova` |
 | Build command | `npm run build` |
