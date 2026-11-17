@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: panem-u-planetary-analog-atlas
+    runtime: python
+    plan: free
+    buildCommand: python -m pip install --only-binary=:all: -r planetary-analog-terranova/requirements-runtime.txt
+    startCommand: cd planetary-analog-terranova && python -m uvicorn src.api.main:app --host 0.0.0.0 --port "$PORT"
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.12"
+      - key: OFFLINE
+        value: "0"
+      - key: EAF_WARM
+        value: "0"
